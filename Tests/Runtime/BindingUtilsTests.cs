@@ -1,5 +1,4 @@
 ﻿using System;
-using FluentAssertions;
 using NUnit.Framework;
 
 namespace Mace.Tests
@@ -14,7 +13,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -25,7 +24,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -36,7 +35,8 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeFalse();
+			Assert.IsFalse(canBeBound);
+
 		}
 
 		[Test]
@@ -47,7 +47,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -58,7 +58,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -69,7 +69,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeFalse();
+			Assert.IsFalse(canBeBound);
 		}
 
 		[Test]
@@ -80,7 +80,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -91,7 +91,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -102,7 +102,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -113,7 +113,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeFalse();
+			Assert.IsFalse(canBeBound);
 		}
 
 		[Test]
@@ -124,7 +124,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -135,7 +135,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -146,7 +146,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeTrue();
+			Assert.IsTrue(canBeBound);
 		}
 
 		[Test]
@@ -157,7 +157,7 @@ namespace Mace.Tests
 
 			bool canBeBound = BindingUtils.CanBeBound(actualType, targetType);
 
-			canBeBound.Should().BeFalse();
+			Assert.IsFalse(canBeBound);
 		}
 
 		[Test]
@@ -168,7 +168,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeTrue();
+			Assert.IsTrue(needsToBeBoxed);
 		}
 
 		[Test]
@@ -179,7 +179,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeFalse();
+			Assert.IsFalse(needsToBeBoxed);
 		}
 
 		[Test]
@@ -190,7 +190,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeTrue();
+			Assert.IsTrue(needsToBeBoxed);
 		}
 
 		[Test]
@@ -201,7 +201,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeFalse();
+			Assert.IsFalse(needsToBeBoxed);
 		}
 
 		[Test]
@@ -212,7 +212,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeTrue();
+			Assert.IsTrue(needsToBeBoxed);
 		}
 
 		[Test]
@@ -223,7 +223,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeFalse();
+			Assert.IsFalse(needsToBeBoxed);
 		}
 
 		[Test]
@@ -234,7 +234,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeTrue();
+			Assert.IsTrue(needsToBeBoxed);
 		}
 
 		[Test]
@@ -245,7 +245,7 @@ namespace Mace.Tests
 
 			bool needsToBeBoxed = BindingUtils.NeedsToBeBoxed(actualType, targetType);
 
-			needsToBeBoxed.Should().BeFalse();
+			Assert.IsFalse(needsToBeBoxed);
 		}
 	}
 }
