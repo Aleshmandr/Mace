@@ -6,7 +6,7 @@ namespace Mace
 	public class EnableBehaviourBinder : ComponentBinder
 	{
 		[SerializeField] private BindingInfo isEnabled = BindingInfo.Variable<bool>();
-		[SerializeField] private List<Behaviour> targets = default;
+		[SerializeField] private List<Behaviour> targets;
 
 		protected override void Awake()
 		{
