@@ -1,5 +1,5 @@
 {
-    "name": "Uice.Runtime.Tests",
+    "name": "Mace.Runtime.Tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
