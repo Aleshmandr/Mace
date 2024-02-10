@@ -36,16 +36,12 @@ namespace Mace
 
         public void SetData(object data)
         {
-            if (ViewModel == null)
+            if (ExpectedType != null)
             {
-                if (ExpectedType != null)
-                {
-                    ViewModel = (IViewModel)data;
-                }
-                else
-                {
-                    Debug.LogError("Expected Type must be set", this);
-                }
+                ViewModel = (IViewModel)data;
+            } else
+            {
+                Debug.LogError("Expected Type must be set", this);
             }
         }
 
