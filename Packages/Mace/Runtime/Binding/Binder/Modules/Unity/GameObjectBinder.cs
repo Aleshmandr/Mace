@@ -15,6 +15,26 @@ namespace Mace
 			RegisterVariable<bool>(isActive).OnChanged(HandleActiveStateChange);
 		}
 
+		protected override void OnEnable()
+		{
+			// Do nothing. Bind() moved to Start()
+		}
+
+		protected override void OnDisable()
+		{
+			// Do nothing. Unbind() moved to OnDestroy()
+		}
+
+		protected void Start()
+		{
+			Bind();
+		}
+
+		protected void OnDestroy()
+		{
+			Unbind();
+		}
+
 		private void HandleNameChange(object newValue)
 		{
 			gameObject.name = newValue != null ? newValue.ToString() : string.Empty;

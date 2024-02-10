@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Mace.Editor
 {
-	public static class UiceEditorGuiUtility
+	public static class MaceEditorGuiUtility
 	{
 		public class Icons
 		{

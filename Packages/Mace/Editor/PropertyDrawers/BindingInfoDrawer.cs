@@ -137,7 +137,7 @@ namespace Mace.Editor
 				var menu = new GenericMenu();
 
 				menu.AddItem(
-					new GUIContent("Force dynamic binding", UiceEditorGuiUtility.Icons.Unlink),
+					new GUIContent("Force dynamic binding", MaceEditorGuiUtility.Icons.Unlink),
 					GetForceDynamicBinding(property),
 					() =>
 					{
@@ -326,7 +326,7 @@ namespace Mace.Editor
 			iconRect.width -= 6;
 			iconRect.height -= 6;
 
-			EditorGUI.LabelField(iconRect, UiceEditorGuiUtility.ContentIcons.Unlink);
+			EditorGUI.LabelField(iconRect, MaceEditorGuiUtility.ContentIcons.Unlink);
 
 			position.x += indicatorRect.width;
 			position.width -= indicatorRect.width;

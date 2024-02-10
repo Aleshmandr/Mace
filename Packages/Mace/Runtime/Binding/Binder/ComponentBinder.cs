@@ -13,10 +13,20 @@ namespace Mace
 
 		protected virtual void OnEnable()
 		{
-			bindingTracker.Bind();
+			Bind();
 		}
 
 		protected virtual void OnDisable()
+		{
+			Unbind();
+		}
+
+		protected void Bind()
+		{
+			bindingTracker.Bind();
+		}
+
+		protected void Unbind()
 		{
 			bindingTracker.Unbind();
 		}
