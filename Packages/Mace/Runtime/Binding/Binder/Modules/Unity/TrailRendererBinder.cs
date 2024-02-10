@@ -2,37 +2,39 @@ using UnityEngine;
 
 namespace Mace
 {
+    [RequireComponent(typeof(TrailRenderer))]
     public class TrailRendererBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo isEmitting = BindingInfo.Variable<bool>();
         [SerializeField] private BindingInfo time = BindingInfo.Variable<float>();
-        [SerializeField] private TrailRenderer target;
+        private TrailRenderer trailRenderer;
 
         protected override void Awake()
         {
             base.Awake();
+            trailRenderer = GetComponent<TrailRenderer>();
             RegisterVariable<bool>(isEmitting).OnChanged(HandleEmitChange);
             RegisterVariable<float>(time).OnChanged(HandleTimeChange);
         }
 
         private void HandleTimeChange(float value)
         {
-            if (target != null)
+            if (trailRenderer == null)
             {
                 return;
             }
 
-            target.time = value;
+            trailRenderer.time = value;
         }
 
         private void HandleEmitChange(bool value)
         {
-            if (target != null)
+            if (trailRenderer == null)
             {
                 return;
             }
 
-            target.emitting = value;
+            trailRenderer.emitting = value;
         }
     }
 }

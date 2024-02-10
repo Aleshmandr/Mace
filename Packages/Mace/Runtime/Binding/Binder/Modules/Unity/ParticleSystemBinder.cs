@@ -2,31 +2,33 @@ using UnityEngine;
 
 namespace Mace
 {
+    [RequireComponent(typeof(ParticleSystem))]
     public class ParticleSystemBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo play = BindingInfo.Variable<bool>();
-        [SerializeField] private ParticleSystem target;
+        private ParticleSystem particles;
 
         protected override void Awake()
         {
             base.Awake();
+            particles = GetComponent<ParticleSystem>();
             RegisterVariable<bool>(play).OnChanged(HandlePlayChange);
         }
         
         private void HandlePlayChange(bool value)
         {
-            if (target != null)
+            if (particles == null)
             {
                 return;
             }
 
             if (value)
             {
-                target.Play(true);
+                particles.Play(true);
             }
             else
             {
-                target.Stop(true);
+                particles.Stop(true);
             }
         }
     }
