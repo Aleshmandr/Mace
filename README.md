@@ -2,6 +2,10 @@
 Mace is a MVVM framework for Unity
 This framework is used in the [Uice framework](https://github.com/Aleshmandr/Uice) but can be used separately.
 
+## Installation
+You can add this Git package via Unity package manager:
+https://github.com/Aleshmandr/Mace.git
+
 ## Framework's Philosophy
 The framework encourages a [Model-View-ViewModel](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) approach, splitting the main concerns of any UI piece into a couple of classes that interoperate together.
 
