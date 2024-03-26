@@ -58,7 +58,7 @@ namespace Mace
         [MenuItem("CONTEXT/Animator/Add Binder")]
         private static void AddBinder(MenuCommand command)
         {
-            Animation animator = (Animation)command.context;
+            Animator animator = (Animator)command.context;
             animator.GetOrAddComponent<AnimatorBinder>();
         }
 
