@@ -72,6 +72,11 @@ namespace Mace
 
         private void ValidateParameters<T>(IEnumerable<AnimatorParameterBindingInfo<T>> parameters)
         {
+            if (parameters == null)
+            {
+                return;
+            }
+            
             foreach (var bindingInfo in parameters)
             {
                 bindingInfo.ValidateBinding();
