@@ -27,7 +27,8 @@ namespace Mace
                 if (value)
                 {
                     animator.SetTrigger(parameterId);
-                } else
+                }
+                else
                 {
                     animator.ResetTrigger(parameterId);
                 }
@@ -57,8 +58,8 @@ namespace Mace
         [MenuItem("CONTEXT/Animator/Add Binder")]
         private static void AddBinder(MenuCommand command)
         {
-            CanvasGroup context = (CanvasGroup)command.context;
-            context.GetOrAddComponent<AnimatorBinder>();
+            Animation animator = (Animation)command.context;
+            animator.GetOrAddComponent<AnimatorBinder>();
         }
 
         private void OnValidate()
