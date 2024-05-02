@@ -42,9 +42,16 @@ namespace Mace.Editor
 			// Getting the field type this way assumes that the property instance is not a managed reference (with a SerializeReference attribute); if it was, it should be retrieved in a different way:
 			Type fieldType = fieldInfo.FieldType;
 
+			
+#if UNITY_2022_1_OR_NEWER
+			var parameters = new object[] { fieldType, false };
+#else
+			var parameters = new object[] { fieldType };
+#endif
+			
 			Type propertyDrawerType = (Type) Type.GetType("UnityEditor.ScriptAttributeUtility,UnityEditor")
 				.GetMethod("GetDrawerTypeForType", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-				.Invoke(null, new object[] {fieldType});
+				.Invoke(null, parameters);
 
 			PropertyDrawer propertyDrawer = null;
 
