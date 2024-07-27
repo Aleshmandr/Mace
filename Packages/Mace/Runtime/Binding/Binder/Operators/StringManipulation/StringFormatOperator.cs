@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Mace.Utils;
 using UnityEngine;
 
 namespace Mace
@@ -60,5 +61,30 @@ namespace Mace
 				exposedProperty.Value = string.Format(formatBinding.Property.Value, parametersBindingList.Values.ToArray());
 			}
 		}
+		
+#if UNITY_EDITOR
+
+		protected override void OnValidate()
+		{
+			base.OnValidate();
+			SanitizeTypes();
+		}
+
+		private void SanitizeTypes()
+		{
+			bool didTypeChange = false;
+
+			if (expectedType?.Type == null)
+			{
+				expectedType = new SerializableType(InjectionType);
+				didTypeChange = true;
+			}
+
+			if (didTypeChange)
+			{
+				BindingInfoTrackerProxy.RefreshBindingInfo();
+			}
+		}
+#endif
 	}
 }

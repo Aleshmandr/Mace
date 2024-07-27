@@ -48,15 +48,6 @@ namespace Mace
 			inputField.onEndEdit.RemoveListener(OnInputFieldEditionEnded);
 		}
 
-#if UNITY_EDITOR
-		[MenuItem("CONTEXT/TMP_InputField/Add Binder")]
-		private static void AddBinder(MenuCommand command)
-		{
-			TMP_InputField context = (TMP_InputField)command.context;
-			context.GetOrAddComponent<TextMeshProInputFieldBinder>();
-		}
-#endif
-
 		private void OnCommandCanExecuteChanged(bool newValue)
 		{
 			inputField.interactable = newValue;
@@ -92,6 +83,15 @@ namespace Mace
 				inputField.characterLimit = newValue;
 			}
 		}
+		
+#if UNITY_EDITOR
+		[MenuItem("CONTEXT/TMP_InputField/Add Binder")]
+		private static void AddBinder(MenuCommand command)
+		{
+			TMP_InputField context = (TMP_InputField)command.context;
+			context.GetOrAddComponent<TextMeshProInputFieldBinder>();
+		}
+#endif
 	}
 }
 #endif
