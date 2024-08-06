@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Mace.Pooling;
 using Mace.Utils;
@@ -6,93 +5,106 @@ using UnityEngine;
 
 namespace Mace
 {
-	public class SpawnPrefabBinder: ComponentBinder
-	{
-		private Transform Parent => parent ? parent : transform;
+    public class SpawnPrefabBinder : ComponentBinder
+    {
+        [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
+        [SerializeField] private List<BindableViewModelComponent> prefabs;
+        [SerializeField] private Transform parent;
+        [SerializeField] private ObjectPool pool;
 
-		[SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
-		[SerializeField] private List<BindableViewModelComponent> prefabs;
-		[SerializeField] private Transform parent;
-		[SerializeField] private ObjectPool pool;
+        private PrefabPicker<BindableViewModelComponent> prefabPicker;
+        private BindableViewModelComponent currentItem;
+        
+        private Transform Parent => parent ? parent : transform;
 
-		private PrefabPicker<BindableViewModelComponent> prefabPicker;
-		private BindableViewModelComponent currentItem;
+        protected override void Awake()
+        {
+            base.Awake();
 
-		protected void Reset()
-		{
-			pool = GetComponent<ObjectPool>();
-		}
+            RegisterVariable<object>(objectToInstantiate)
+                .OnChanged(OnObjectChanged)
+                .OnCleared(OnObjectCleared);
 
-		protected virtual void OnValidate()
-		{
-			if (!parent)
-			{
-				parent = transform;
-			}
-		}
+            prefabPicker = new PrefabPicker<BindableViewModelComponent>(prefabs);
+            currentItem = null;
 
-		protected override void Awake()
-		{
-			base.Awake();
+            FillPool();
+        }
 
-			RegisterVariable<object>(objectToInstantiate)
-				.OnChanged(OnObjectChanged)
-				.OnCleared(OnObjectCleared);
+        private void FillPool()
+        {
+            if (pool == null)
+            {
+                return;
+            }
+            
+            foreach (BindableViewModelComponent prefab in prefabs)
+            {
+                pool.CreatePool(prefab, 1);
+            }
+        }
 
-			prefabPicker = new PrefabPicker<BindableViewModelComponent>(prefabs);
-			currentItem = null;
+        private void OnObjectChanged(object value)
+        {
+            BindableViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
 
-			if (!pool)
-			{
-				pool = this.GetOrAddComponent<ObjectPool>();
-			}
+            if (bestPrefab)
+            {
+                if (currentItem == null || bestPrefab.ExpectedType != currentItem.ExpectedType)
+                {
+                    currentItem = SpawnItem(bestPrefab, Parent);
+                }
 
-			foreach (BindableViewModelComponent prefab in prefabs)
-			{
-				pool.CreatePool(prefab, 1);
-			}
-		}
+                currentItem.SetData(value);
+            }
+            else
+            {
+                Clear();
 
-		private void OnObjectChanged(object value)
-		{
-			BindableViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
+                Debug.LogError($"A matching prefab could not be found for {value} ({value.GetType().GetPrettifiedName()})");
+            }
+        }
 
-			if (bestPrefab)
-			{
-				if (currentItem == null || bestPrefab.ExpectedType != currentItem.ExpectedType)
-				{
-					currentItem = SpawnItem(bestPrefab, Parent);
-				}
+        private void OnObjectCleared()
+        {
+            Clear();
+        }
 
-				currentItem.SetData(value);
-			}
-			else
-			{
-				Clear();
+        private BindableViewModelComponent SpawnItem(BindableViewModelComponent prefab, Transform parent)
+        {
+            Clear();
+            return pool != null ? pool.Spawn(prefab, parent, false) : Instantiate(prefab, parent, false);
+        }
 
-				Debug.LogError($"A matching prefab could not be found for {value} ({value.GetType().GetPrettifiedName()})");
-			}
-		}
+        private void Clear()
+        {
+            if (currentItem != null)
+            {
+                return;
+            }
 
-		private void OnObjectCleared()
-		{
-			Clear();
-		}
+            if (pool == null)
+            {
+                Destroy(currentItem);
+            }
+            else
+            {
+                pool.Recycle(currentItem);
+            }
 
-		private BindableViewModelComponent SpawnItem(BindableViewModelComponent prefab, Transform parent)
-		{
-			Clear();
+            currentItem = null;
+        }
 
-			return pool.Spawn(prefab, parent, false);
-		}
 
-		private void Clear()
-		{
-			if (currentItem != null)
-			{
-				pool.Recycle(currentItem);
-				currentItem = null;
-			}
-		}
-	}
+#if UNITY_EDITOR
+        protected void Reset()
+        {
+            pool = GetComponent<ObjectPool>();
+            if (parent == null)
+            {
+                parent = transform;
+            }
+        }
+#endif
+    }
 }
