@@ -12,7 +12,7 @@ namespace Mace.Editor
 
         public SerializableTypeTreeView(TreeViewState state, IReadOnlyDictionary<Type, string> values) : base(state)
         {
-            this.values = values.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);;
+            this.values = values;
             Reload();
         }
 
@@ -24,24 +24,29 @@ namespace Mace.Editor
 
             if (values != null)
             {
-                foreach (var pair in values)
+                var sortedPathValues = values.Select(pair =>
                 {
                     var pathAttribute = (PathAttribute)Attribute.GetCustomAttribute(pair.Key, typeof(PathAttribute));
                     var fullPath = pathAttribute == null ? pair.Value : pathAttribute.Path + '/' + pair.Value;
+                    return new KeyValuePair<Type, string>(pair.Key, fullPath);
+                }).OrderBy(pair => pair.Value);
 
-                    var splitPath = fullPath.Split('/');
+                foreach (var pair in sortedPathValues)
+                {
+                    var splitPath = pair.Value.Split('/');
                     int depth = -1;
                     leafPath.Clear();
                     foreach (string pathTreeLeaf in splitPath)
                     {
                         leafPath.Append(pathTreeLeaf);
-                        
+
                         depth++;
                         int hash = leafPath.ToString().GetHashCode();
                         if (items.Any(item => item.id == hash))
                         {
                             continue;
                         }
+
                         items.Add(new TreeViewItem(id: hash, depth: depth, displayName: pathTreeLeaf));
                     }
                 }
