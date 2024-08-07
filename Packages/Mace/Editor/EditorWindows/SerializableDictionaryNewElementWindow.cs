@@ -41,6 +41,8 @@ namespace Mace.Editor
 
 		private void OnGUI()
 		{
+			dictionary.serializedObject.Update();
+			
 			using (new EditorGUILayout.HorizontalScope())
 			{
 				EditorGUILayout.LabelField("Key", GUILayout.MaxWidth(LabelWidth));
@@ -52,6 +54,8 @@ namespace Mace.Editor
 				EditorGUILayout.LabelField("Value", GUILayout.MaxWidth(LabelWidth));
 				EditorGUILayout.PropertyField(value, GUIContent.none);
 			}
+			
+			dictionary.serializedObject.ApplyModifiedProperties();
 			
 			GUI.enabled = IsKeyAvailable();
 			
