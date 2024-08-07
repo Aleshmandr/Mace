@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Mace
 {
-	public class BooleanLogicalOperator : CombineLatestOperator<bool, bool>
+	public class BoolLogicalOperator : CombineLatestOperator<bool, bool>
 	{
 		public enum LogicalOperation
 		{

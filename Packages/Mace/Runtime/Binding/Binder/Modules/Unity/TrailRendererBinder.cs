@@ -1,3 +1,7 @@
+using Mace.Utils;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Mace
@@ -19,22 +23,21 @@ namespace Mace
 
         private void HandleTimeChange(float value)
         {
-            if (trailRenderer == null)
-            {
-                return;
-            }
-
             trailRenderer.time = value;
         }
 
         private void HandleEmitChange(bool value)
         {
-            if (trailRenderer == null)
-            {
-                return;
-            }
-
             trailRenderer.emitting = value;
         }
+        
+#if UNITY_EDITOR
+        [MenuItem("CONTEXT/TrailRenderer/Add Binder")]
+        private static void AddBinder(MenuCommand command)
+        {
+            TrailRenderer context = (TrailRenderer) command.context;
+            context.GetOrAddComponent<TrailRendererBinder>();
+        }
+#endif
     }
 }

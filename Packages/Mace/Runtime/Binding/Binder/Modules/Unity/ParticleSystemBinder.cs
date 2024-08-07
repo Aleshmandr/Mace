@@ -1,4 +1,8 @@
+using Mace.Utils;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Mace
 {
@@ -17,11 +21,6 @@ namespace Mace
         
         private void HandlePlayChange(bool value)
         {
-            if (particles == null)
-            {
-                return;
-            }
-
             if (value)
             {
                 particles.Play(true);
@@ -31,5 +30,14 @@ namespace Mace
                 particles.Stop(true);
             }
         }
+        
+#if UNITY_EDITOR
+        [MenuItem("CONTEXT/ParticleSystem/Add Binder")]
+        private static void AddBinder(MenuCommand command)
+        {
+            ParticleSystem context = (ParticleSystem) command.context;
+            context.GetOrAddComponent<ParticleSystemBinder>();
+        }
+#endif
     }
 }

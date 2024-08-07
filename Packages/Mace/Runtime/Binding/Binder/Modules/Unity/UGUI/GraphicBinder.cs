@@ -21,16 +21,15 @@ namespace Mace
 
 			graphic = GetComponent<Graphic>();
 
-			if (graphic)
-			{
-				RegisterVariable<Color>(color).OnChanged(OnColorChanged);
-				RegisterVariable<Material>(material).OnChanged(OnMaterialChanged);
-				RegisterVariable<bool>(raycastTarget).OnChanged(OnRaycastTargetChanged);
-			}
-			else
+			if (graphic == null)
 			{
 				Debug.LogError($"{nameof(GraphicBinder)} requires a {nameof(Graphic)} to work.", this);
+				return;
 			}
+			
+			RegisterVariable<Color>(color).OnChanged(OnColorChanged);
+			RegisterVariable<Material>(material).OnChanged(OnMaterialChanged);
+			RegisterVariable<bool>(raycastTarget).OnChanged(OnRaycastTargetChanged);
 		}
 
 #if UNITY_EDITOR
