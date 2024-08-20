@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Mace
@@ -6,23 +7,31 @@ namespace Mace
 	{
 		[SerializeField] private BindingInfo objectName = BindingInfo.Variable<object>();
 		[SerializeField] private BindingInfo isActive = BindingInfo.Variable<bool>();
-
+		[SerializeField] private BindingInfo onActivityStateChanged = BindingInfo.Command<bool>();
+		private event Action<bool> activityChanged;
+		
 		protected override void Awake()
 		{
 			base.Awake();
 			
 			RegisterVariable<object>(objectName).OnChanged(HandleNameChange);
 			RegisterVariable<bool>(isActive).OnChanged(HandleActiveStateChange);
+			RegisterCommand<bool>(onActivityStateChanged).AddExecuteTrigger(AddActivityTrigger);
+		}
+
+		private void AddActivityTrigger(Action<bool> action)
+		{
+			activityChanged += action;
 		}
 
 		protected override void OnEnable()
 		{
-			// Do nothing. Bind() moved to Start()
+			activityChanged?.Invoke(true);
 		}
 
 		protected override void OnDisable()
 		{
-			// Do nothing. Unbind() moved to OnDestroy()
+			activityChanged?.Invoke(false);
 		}
 
 		protected void Start()
