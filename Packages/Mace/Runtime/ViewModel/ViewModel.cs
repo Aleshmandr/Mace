@@ -6,12 +6,22 @@
 
         public void Enable()
         {
+            if (IsEnabled)
+            {
+                return;
+            }
+
             IsEnabled = true;
             OnEnable();
         }
 
         public void Disable()
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             IsEnabled = false;
             OnDisable();
         }

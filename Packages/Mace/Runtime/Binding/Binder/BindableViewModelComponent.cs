@@ -32,6 +32,7 @@ namespace Mace
         {
             binding.Property.Changed -= SetData;
             binding.Unbind();
+            ViewModel?.Disable();
         }
 
         public void SetData(object data)
