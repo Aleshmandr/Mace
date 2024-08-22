@@ -12,6 +12,8 @@ namespace Mace
         [SerializeField] private BindingInfo sprite = BindingInfo.Variable<Sprite>();
         [SerializeField] private BindingInfo flipX = BindingInfo.Variable<bool>();
         [SerializeField] private BindingInfo flipY = BindingInfo.Variable<bool>();
+        [SerializeField] private BindingInfo sizeX = BindingInfo.Variable<float>();
+        [SerializeField] private BindingInfo sizeY = BindingInfo.Variable<float>();
         [SerializeField] private BindingInfo material = BindingInfo.Variable<Material>();
         private SpriteRenderer spriteRenderer;
 
@@ -22,6 +24,8 @@ namespace Mace
             RegisterVariable<Sprite>(sprite).OnChanged(HandleSpriteChange);
             RegisterVariable<bool>(flipX).OnChanged(HandleFlipXChange);
             RegisterVariable<bool>(flipY).OnChanged(HandleFlipYChange);
+            RegisterVariable<float>(sizeX).OnChanged(HandleSizeXChange);
+            RegisterVariable<float>(sizeY).OnChanged(HandleSizeYChange);
             RegisterVariable<Material>(material).OnChanged(HandleMaterialChange);
         }
 
@@ -43,6 +47,16 @@ namespace Mace
         private void HandleSpriteChange(Sprite value)
         {
             spriteRenderer.sprite = value;
+        }
+
+        private void HandleSizeXChange(float size)
+        {
+            spriteRenderer.size = new Vector2(size, spriteRenderer.size.y);
+        }
+
+        private void HandleSizeYChange(float size)
+        {
+            spriteRenderer.size = new Vector2(spriteRenderer.size.x, size);
         }
 
 #if UNITY_EDITOR
