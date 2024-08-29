@@ -46,6 +46,13 @@ namespace Mace
 		{
 			EnsureId();
 		}
+		
+		protected virtual void OnEnable() {}
+
+		protected virtual void OnDisable()
+		{
+			ViewModel?.Disable();
+		}
 
 		protected virtual void OnViewModelChanged(T lastViewModel, T newViewModel)
 		{

@@ -22,17 +22,18 @@ namespace Mace
             binding = new VariableBinding<object>(bindingInfo, this);
         }
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             binding.Property.Changed += SetData;
             binding.Bind();
         }
 
-        protected virtual void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             binding.Property.Changed -= SetData;
             binding.Unbind();
-            ViewModel?.Disable();
         }
 
         public void SetData(object data)
