@@ -29,6 +29,31 @@ namespace Mace
             RetrieveRequiredComponents();
         }
         
+        public virtual void SetViewModel(IViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                return;
+            }
+            
+            if (viewModel is T typedViewModel)
+            {
+                SetViewModel(typedViewModel);
+            }
+            else
+            {
+                Debug.LogError($"ViewModel passed have wrong type! ({viewModel.GetType()} instead of {typeof(T)})", this);
+            }
+        }
+        
+        protected virtual void SetViewModel(T viewModel)
+        {
+            if (targetComponent != null)
+            {
+                targetComponent.ViewModel = viewModel;
+            }
+        }
+        
         protected virtual void OnViewModelChanged(T lastViewModel, T newViewModel)
         {
             ViewModelChanged?.Invoke(this, lastViewModel, newViewModel);
