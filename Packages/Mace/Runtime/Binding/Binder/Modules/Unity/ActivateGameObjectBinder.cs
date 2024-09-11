@@ -6,7 +6,7 @@ namespace Mace
 	public class ActivateGameObjectBinder : ComponentBinder
 	{
 		[SerializeField] private BindingInfo setActive = BindingInfo.Variable<bool>();
-		[SerializeField] private List<GameObject> targets;
+		[SerializeField] private List<ActivateGameObjectData> targets;
 
 		protected override void Awake()
 		{
@@ -17,12 +17,14 @@ namespace Mace
 
 		private void Refresh(bool value)
 		{
-			foreach (GameObject current in targets)
+			foreach (var current in targets)
 			{
-				if (current)
+				if (current.Target == null)
 				{
-					current.SetActive(value);
+					continue;
 				}
+
+				current.Target.SetActive(current.Invert ? !value : value);
 			}
 		}
 	}
