@@ -55,6 +55,11 @@ namespace Mace
 			OnCleared();
 		}
 		
+		public void SetValueWithoutNotification(T newValue)
+		{
+			SetValue(newValue);
+		}
+		
 		public void ForceChangedNotification()
 		{
 			OnChanged(Value);
