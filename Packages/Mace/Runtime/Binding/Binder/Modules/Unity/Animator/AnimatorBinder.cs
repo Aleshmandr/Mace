@@ -13,6 +13,7 @@ namespace Mace
         [SerializeField] private AnimatorIntParameterBindingInfo[] intParameters;
         [SerializeField] private AnimatorFloatParameterBindingInfo[] floatParameters;
         [SerializeField] private AnimatorBoolParameterBindingInfo[] triggerParameters;
+        [SerializeField] private AnimatorEventBindingInfo[] setTriggerEvents;
         private Animator animator;
 
         protected override void Awake()
@@ -33,8 +34,35 @@ namespace Mace
                     animator.ResetTrigger(parameterId);
                 }
             });
+            RegisterEvents(setTriggerEvents, parameterId => animator.SetTrigger(parameterId));
         }
 
+        private void RegisterEvents(AnimatorEventBindingInfo[] events, Action<int> setAnimatorParameter)
+        {
+            if (events == null)
+            {
+                return;
+            }
+
+            foreach (var parameter in events)
+            {
+                RegisterEvent(parameter.Binding).OnRaised(() => setAnimatorParameter.Invoke(parameter.Id));
+            }
+        }
+        
+        private void RegisterEvents<T>(AnimatorEventBindingInfo[] events, Action<int, T> setAnimatorParameter)
+        {
+            if (events == null)
+            {
+                return;
+            }
+
+            foreach (var parameter in events)
+            {
+                RegisterEvent<T>(parameter.Binding).OnRaised(value => setAnimatorParameter(parameter.Id, value));
+            }
+        }
+        
         private void RegisterParameters<T>(IEnumerable<AnimatorParameterBindingInfo<T>> parameters, Action<int, T> setAnimatorParameter)
         {
             if (parameters == null)
@@ -68,8 +96,22 @@ namespace Mace
             ValidateParameters(intParameters);
             ValidateParameters(floatParameters);
             ValidateParameters(triggerParameters);
+            ValidateEvents(setTriggerEvents);
         }
 
+        private void ValidateEvents(IEnumerable<AnimatorEventBindingInfo> events)
+        {
+            if (events == null)
+            {
+                return;
+            }
+            
+            foreach (var bindingInfo in events)
+            {
+                bindingInfo.ValidateBinding();
+            }
+        }
+        
         private void ValidateParameters<T>(IEnumerable<AnimatorParameterBindingInfo<T>> parameters)
         {
             if (parameters == null)
