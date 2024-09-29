@@ -78,14 +78,14 @@ namespace Mace
 
         private void Clear()
         {
-            if (currentItem != null)
+            if (currentItem == null)
             {
                 return;
             }
 
             if (pool == null)
             {
-                Destroy(currentItem);
+                Destroy(currentItem.gameObject);
             }
             else
             {
