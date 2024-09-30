@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Mace
 {
-	public class BindingTracker
+	public class BindingTracker : IDisposable
 	{
 		private readonly Component viewModel;
 		private readonly List<Binding> bindings;
@@ -28,6 +29,12 @@ namespace Mace
 			{
 				current.Unbind();
 			}
+		}
+		
+		public void Dispose()
+		{
+			Unbind();
+			bindings.Clear();
 		}
 
 		public VariableBindingSubscriber<T> RegisterVariable<T>(BindingInfo info)
