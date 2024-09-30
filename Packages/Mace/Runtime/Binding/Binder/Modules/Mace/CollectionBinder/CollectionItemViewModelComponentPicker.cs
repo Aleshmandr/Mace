@@ -53,7 +53,7 @@ namespace Mace
 
 			if (pool)
 			{
-				pool.Recycle(item);
+				pool.Recycle(item, false);
 			}
 			else
 			{
@@ -91,11 +91,11 @@ namespace Mace
 
 			if (pool)
 			{
-				result = pool.Spawn(bestPrefab, parent);
+				result = pool.Spawn(bestPrefab, parent, false);
 			}
 			else
 			{
-				result = Instantiate(bestPrefab, parent);
+				result = Instantiate(bestPrefab, parent, false);
 				result.gameObject.SetActive(true);
 			}
 
