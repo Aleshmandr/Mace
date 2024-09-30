@@ -14,21 +14,31 @@ namespace Mace
 
         private PrefabPicker<ViewModelComponent> prefabPicker;
         private ViewModelComponent currentItem;
+        private bool isInitialized;
         
         private Transform Parent => parent ? parent : transform;
 
         protected override void Awake()
         {
             base.Awake();
+            EnsureInitialState();
+        }
+        
+        private void EnsureInitialState()
+        {
+            if (isInitialized == false)
+            {
+                isInitialized = true;
 
-            RegisterVariable<object>(objectToInstantiate)
-                .OnChanged(OnObjectChanged)
-                .OnCleared(OnObjectCleared);
+                RegisterVariable<object>(objectToInstantiate)
+                    .OnChanged(OnObjectChanged)
+                    .OnCleared(OnObjectCleared);
 
-            prefabPicker = new PrefabPicker<ViewModelComponent>(prefabs);
-            currentItem = null;
+                prefabPicker = new PrefabPicker<ViewModelComponent>(prefabs);
+                currentItem = null;
 
-            FillPool();
+                FillPool();
+            }
         }
 
         private void FillPool()
@@ -46,6 +56,8 @@ namespace Mace
 
         private void OnObjectChanged(object value)
         {
+            EnsureInitialState();
+            
             ViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
 
             if (bestPrefab)
@@ -78,6 +90,8 @@ namespace Mace
 
         private void Clear()
         {
+            EnsureInitialState();
+            
             if (currentItem == null)
             {
                 return;
