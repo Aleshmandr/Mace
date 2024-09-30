@@ -8,12 +8,12 @@ namespace Mace
     public class SpawnPrefabBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
-        [SerializeField] private List<BindableViewModelComponent> prefabs;
+        [SerializeField] private List<ViewModelComponent> prefabs;
         [SerializeField] private Transform parent;
         [SerializeField] private ObjectPool pool;
 
-        private PrefabPicker<BindableViewModelComponent> prefabPicker;
-        private BindableViewModelComponent currentItem;
+        private PrefabPicker<ViewModelComponent> prefabPicker;
+        private ViewModelComponent currentItem;
         
         private Transform Parent => parent ? parent : transform;
 
@@ -25,7 +25,7 @@ namespace Mace
                 .OnChanged(OnObjectChanged)
                 .OnCleared(OnObjectCleared);
 
-            prefabPicker = new PrefabPicker<BindableViewModelComponent>(prefabs);
+            prefabPicker = new PrefabPicker<ViewModelComponent>(prefabs);
             currentItem = null;
 
             FillPool();
@@ -38,7 +38,7 @@ namespace Mace
                 return;
             }
             
-            foreach (BindableViewModelComponent prefab in prefabs)
+            foreach (ViewModelComponent prefab in prefabs)
             {
                 pool.CreatePool(prefab, 1);
             }
@@ -46,7 +46,7 @@ namespace Mace
 
         private void OnObjectChanged(object value)
         {
-            BindableViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
+            ViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
 
             if (bestPrefab)
             {
@@ -55,7 +55,7 @@ namespace Mace
                     currentItem = SpawnItem(bestPrefab, Parent);
                 }
 
-                currentItem.SetData(value);
+                currentItem.ViewModel = (IViewModel) value;
             }
             else
             {
@@ -70,7 +70,7 @@ namespace Mace
             Clear();
         }
 
-        private BindableViewModelComponent SpawnItem(BindableViewModelComponent prefab, Transform parent)
+        private ViewModelComponent SpawnItem(ViewModelComponent prefab, Transform parent)
         {
             Clear();
             return pool != null ? pool.Spawn(prefab, parent, false) : Instantiate(prefab, parent, false);

@@ -2,49 +2,70 @@ using UnityEngine;
 
 namespace Mace.Utils
 {
-	public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
-	{
-		private static readonly object lockObject = new object();
+    public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    {
+        private static readonly object lockObject = new object();
+        private static T instance;
+        private static bool isApplicationQuitting = false;
 
-		public static T Instance
-		{
-			get
-			{
-				lock (lockObject)
-				{
-					if (!instance)
-					{
-						instance = FindObjectOfType<T>();
+        static Singleton()
+        {
+            Application.quitting += OnApplicationQuitting;
+        }
 
-						if (!instance)
-						{
-							GameObject go = new GameObject($"[Uice] {typeof(T).Name}");
-							instance = go.AddComponent<T>();
-							DontDestroyOnLoad(go);
-						}
-					}
+        private static void OnApplicationQuitting()
+        {
+            isApplicationQuitting = true;
+        }
 
-					return instance;
-				}
-			}
-		}
+        public static T Instance
+        {
+            get
+            {
+                if (isApplicationQuitting)
+                {
+                    Debug.LogWarning($"[Mace] Instance of {typeof(T)} already destroyed on application quit. Won't create again - returning null.");
+                    return null;
+                }
 
-		private static T instance;
+                lock (lockObject)
+                {
+                    if (instance == null)
+                    {
+                        instance = FindObjectOfType<T>();
 
-		protected virtual void Start()
-		{
-			if (instance != this)
-			{
-				Destroy(gameObject);
-			}
-		}
+                        if (instance == null)
+                        {
+                            GameObject go = new GameObject($"[Mace] {typeof(T).Name}");
+                            instance = go.AddComponent<T>();
+                            DontDestroyOnLoad(go);
+                        }
+                    }
 
-		protected virtual void OnDestroy()
-		{
-			if (instance == this)
-			{
-				instance = null;
-			}
-		}
-	}
+                    return instance;
+                }
+            }
+        }
+
+        protected virtual void Awake()
+        {
+            if (instance == null)
+            {
+                instance = this as T;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
+        }
+    }
 }

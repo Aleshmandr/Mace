@@ -68,6 +68,20 @@ namespace Mace
 				isInitialized = true;
 
 				prefabPicker = new PrefabPicker<ViewModelComponent>(prefabs);
+				FillPool();
+			}
+		}
+		
+		private void FillPool()
+		{
+			if (pool == null)
+			{
+				return;
+			}
+            
+			foreach (ViewModelComponent prefab in prefabs)
+			{
+				pool.CreatePool(prefab, 1);
 			}
 		}
 
