@@ -1,7 +1,6 @@
 using System;
-using Mace.Utils;
 
-namespace Mace
+namespace Mace.Utils
 {
     public struct BindingEntry
     {

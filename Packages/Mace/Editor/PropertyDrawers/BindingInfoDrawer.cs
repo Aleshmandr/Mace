@@ -239,7 +239,7 @@ namespace Mace.Editor
 			optionIds.Add("None");
 			options.Add("None");
 
-			foreach (Mace.BindingEntry current in BindingUtils.GetBindings(cache.BaseComponent.transform, ResolveTarget(property).Type))
+			foreach (Mace.Utils.BindingEntry current in BindingUtils.GetBindings(cache.BaseComponent.transform, ResolveTarget(property).Type))
 			{
 				if (current.ViewModelComponent != cache.BaseComponent)
 				{

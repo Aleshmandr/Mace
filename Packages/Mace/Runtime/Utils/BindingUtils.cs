@@ -4,7 +4,7 @@ using System.Reflection;
 using Mace.Utils;
 using UnityEngine;
 
-namespace Mace
+namespace Mace.Utils
 {
 	public static class BindingUtils
 	{

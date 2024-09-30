@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mace
+namespace Mace.Utils
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class PathAttribute : Attribute

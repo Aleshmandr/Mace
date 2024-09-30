@@ -1,9 +1,9 @@
 ﻿using System;
-using Mace.Utils;
+using Mace.Utils.Singleton;
 
-namespace Mace
+namespace Mace.Utils
 {
-	public class LifecycleUtils : Singleton<LifecycleUtils>
+	public class LifecycleUtils : PersistentMonoSingleton<LifecycleUtils>
 	{
 		public static event Action OnUpdate
 		{
@@ -30,10 +30,8 @@ namespace Mace
 			onLateUpdate?.Invoke();
 		}
 
-		protected override void OnDestroy()
+		private void OnDestroy()
 		{
-			base.OnDestroy();
-
 			onUpdate = null;
 			onLateUpdate = null;
 		}

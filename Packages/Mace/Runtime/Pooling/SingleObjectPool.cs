@@ -1,8 +1,9 @@
 using Mace.Utils;
+using Mace.Utils.Singleton;
 
 namespace Mace.Pooling
 {
-	public class SingleObjectPool : Singleton<SingleObjectPool>
+	public class SingleObjectPool : PersistentMonoSingleton<SingleObjectPool>
 	{
 		public ObjectPool GlobalPool
 		{
