@@ -13,17 +13,27 @@ namespace Mace
 
 		protected virtual void OnEnable()
 		{
-			bindingTracker.Bind();
+			Bind();
 		}
 
 		protected virtual void OnDisable()
 		{
-			bindingTracker.Unbind();
+			Unbind();
 		}
 		
 		protected virtual void OnDestroy()
 		{
 			bindingTracker.Dispose();
+		}
+
+		protected void Bind()
+		{
+			bindingTracker.Bind();
+		}
+
+		protected void Unbind()
+		{
+			bindingTracker.Unbind();
 		}
 
 		protected VariableBindingSubscriber<T> RegisterVariable<T>(BindingInfo bindingInfo)
