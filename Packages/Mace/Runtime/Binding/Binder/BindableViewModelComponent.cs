@@ -27,6 +27,7 @@ namespace Mace
             base.OnEnable();
             binding.Property.Changed += SetData;
             binding.Bind();
+            SetData(binding.Property.Value);
         }
 
         protected override void OnDisable()

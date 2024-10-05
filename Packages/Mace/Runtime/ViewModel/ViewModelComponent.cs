@@ -20,6 +20,10 @@ namespace Mace
 			get => viewModel;
 			set
 			{
+				if (ReferenceEquals(value, viewModel))
+				{
+					return;
+				}
 				T lastViewModel = viewModel;
 				viewModel?.Disable();
 				viewModel = value;
