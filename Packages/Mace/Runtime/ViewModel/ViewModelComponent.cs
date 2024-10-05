@@ -22,10 +22,15 @@ namespace Mace
 			{
 				if (ReferenceEquals(value, viewModel))
 				{
+					if (viewModel != null && !viewModel.IsEnabled)
+					{
+						viewModel?.Enable();
+					}
 					return;
 				}
-				T lastViewModel = viewModel;
+				
 				viewModel?.Disable();
+				T lastViewModel = viewModel;
 				viewModel = value;
 				viewModel?.Enable();
 				OnViewModelChanged(lastViewModel, viewModel);
