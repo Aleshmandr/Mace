@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mace.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Mace
 {
@@ -14,6 +15,8 @@ namespace Mace
         [SerializeField] private AnimatorFloatParameterBindingInfo[] floatParameters;
         [SerializeField] private AnimatorBoolParameterBindingInfo[] triggerParameters;
         [SerializeField] private AnimatorEventBindingInfo[] setTriggerEvents;
+        [SerializeField] private AnimatorEventDescritor[] eventsCommands;
+        private Dictionary<string, UnityEvent> eventsDictionary;
         private Animator animator;
 
         protected override void Awake()
@@ -35,6 +38,42 @@ namespace Mace
                 }
             });
             RegisterEvents(setTriggerEvents, parameterId => animator.SetTrigger(parameterId));
+
+            if (eventsCommands != null && eventsCommands.Length > 0)
+            {
+                eventsDictionary = new Dictionary<string, UnityEvent>();
+                foreach (var eventDescritor in eventsCommands)
+                {
+                    UnityEvent eventAction = new UnityEvent();
+                    RegisterCommand(eventDescritor.CommandBinding).AddExecuteTrigger(eventAction);
+                    eventsDictionary.Add(eventDescritor.Name, eventAction);
+                }
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (eventsDictionary != null)
+            {
+                foreach (var (_, unityEvent) in eventsDictionary)
+                {
+                    unityEvent.RemoveAllListeners();
+                }
+            }
+        }
+
+        public void ExecuteEvent(string eventName)
+        {
+            if (eventsDictionary == null)
+            {
+                return;
+            }
+
+            if (eventsDictionary.TryGetValue(eventName, out UnityEvent unityEvent))
+            {
+                unityEvent?.Invoke();
+            }
         }
 
         private void RegisterEvents(AnimatorEventBindingInfo[] events, Action<int> setAnimatorParameter)
