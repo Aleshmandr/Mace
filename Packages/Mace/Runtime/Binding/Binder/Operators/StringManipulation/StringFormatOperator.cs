@@ -23,24 +23,24 @@ namespace Mace
 
 			exposedProperty = new ObservableVariable<string>();
 			ViewModel = new OperatorVariableViewModel<string>(exposedProperty);
-
 			formatBinding = new VariableBinding<string>(format, this);
-			formatBinding.Property.Changed += OnFormatChanged;
-
 			parametersBindingList = new BindingList<object>(this, parameters);
-			parametersBindingList.VariableChanged += OnBindingListVariableChanged;
 		}
 
 		protected virtual void OnEnable()
 		{
 			formatBinding.Bind();
 			parametersBindingList.Bind();
+			formatBinding.Property.Changed += OnFormatChanged;
+			parametersBindingList.VariableChanged += OnBindingListVariableChanged;
 		}
 
 		protected virtual void OnDisable()
 		{
 			formatBinding.Unbind();
 			parametersBindingList.Unbind();
+			formatBinding.Property.Changed -= OnFormatChanged;
+			parametersBindingList.VariableChanged -= OnBindingListVariableChanged;
 			exposedProperty.Clear();
 		}
 
