@@ -5,6 +5,7 @@ namespace Mace
 {
 	public abstract class DecorateCommandOperator<T> : Operator
 	{
+		[SerializeField] private bool executeAutoIfCan;
 		[SerializeField] private BindingInfo command = BindingInfo.Command<T>();
 		[SerializeField] private ConstantBindingInfo<T> decoration = new ConstantBindingInfo<T>();
 		
@@ -27,14 +28,12 @@ namespace Mace
 		protected override void OnEnable()
 		{
 			base.OnEnable();
-
 			OnCommandCanExecuteChanged(commandBinding.Property.CanExecute.Value);
 		}
 
 		protected override void OnDisable()
 		{
 			base.OnDisable();
-
 			OnCommandCanExecuteChanged(false);
 		}
 
@@ -48,9 +47,13 @@ namespace Mace
 			commandBinding.Property.Execute(decorationBinding.Property.GetValue(default));
 		}
 
-		private void OnCommandCanExecuteChanged(bool newValue)
+		private void OnCommandCanExecuteChanged(bool canExecute)
 		{
-			exposedCommand.CanExecute.Value = newValue;
+			exposedCommand.CanExecute.Value = canExecute;
+			if (executeAutoIfCan && canExecute)
+			{
+				OnExposedCommandExecuteRequested();
+			}
 		}
 	}
 }
