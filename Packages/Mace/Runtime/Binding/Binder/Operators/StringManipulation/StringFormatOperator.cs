@@ -29,10 +29,10 @@ namespace Mace
 
 		protected virtual void OnEnable()
 		{
-			formatBinding.Bind();
-			parametersBindingList.Bind();
 			formatBinding.Property.Changed += OnFormatChanged;
 			parametersBindingList.VariableChanged += OnBindingListVariableChanged;
+			formatBinding.Bind();
+			parametersBindingList.Bind();
 		}
 
 		protected virtual void OnDisable()
