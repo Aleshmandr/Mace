@@ -116,7 +116,7 @@ namespace Mace
 
 		private void OnBoundPropertyChanged(T newValue)
 		{
-			exposedProperty.Value = newValue;
+			exposedProperty.SetValueForceNotification(newValue);
 		}
 		
 		private void OnBoundPropertyCleared()

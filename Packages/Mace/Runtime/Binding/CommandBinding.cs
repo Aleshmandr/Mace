@@ -55,7 +55,7 @@ namespace Mace
 		{
 			if (boundProperty.CanExecute.HasValue && boundProperty.CanExecute.Value == canExecuteSource.Value)
 			{
-				canExecuteSource.ForceChangedNotification();
+				canExecuteSource.OnChanged();
 			}
 			else
 			{
@@ -165,7 +165,7 @@ namespace Mace
 		{
 			if (boundProperty.CanExecute.HasValue && boundProperty.CanExecute.Value == canExecuteSource.Value)
 			{
-				canExecuteSource.ForceChangedNotification();
+				canExecuteSource.OnChanged();
 			}
 			else
 			{

@@ -60,7 +60,13 @@ namespace Mace
 			SetValue(newValue);
 		}
 		
-		public void ForceChangedNotification()
+		public void SetValueForceNotification(T newValue)
+		{
+			SetValue(newValue);
+			OnChanged(newValue);
+		}
+		
+		public void OnChanged()
 		{
 			OnChanged(Value);
 		}

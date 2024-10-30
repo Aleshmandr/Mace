@@ -10,13 +10,16 @@ namespace Mace
     public class ParticleSystemBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo play = BindingInfo.Variable<bool>();
+        [SerializeField] private BindingInfo color = BindingInfo.Variable<Color>();
         private ParticleSystem particles;
 
         protected override void Awake()
         {
             base.Awake();
             particles = GetComponent<ParticleSystem>();
+          
             RegisterVariable<bool>(play).OnChanged(HandlePlayChange);
+            RegisterVariable<Color>(color).OnChanged(HandleColorChange);
         }
         
         private void HandlePlayChange(bool value)
@@ -29,6 +32,12 @@ namespace Mace
             {
                 particles.Stop(true);
             }
+        }
+
+        private void HandleColorChange(Color color)
+        {
+            var main = particles.main;
+            main.startColor = color;
         }
         
 #if UNITY_EDITOR
