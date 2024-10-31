@@ -1,5 +1,6 @@
 using Mace.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,7 +10,8 @@ namespace Mace
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticleSystemBinder : ComponentBinder
     {
-        [SerializeField] private BindingInfo play = BindingInfo.Variable<bool>();
+        [SerializeField] private BindingInfo isPlaying = BindingInfo.Variable<bool>();
+        [SerializeField] private BindingInfo play = BindingInfo.Event<bool>();
         [SerializeField] private BindingInfo color = BindingInfo.Variable<Color>();
         private ParticleSystem particles;
 
@@ -18,7 +20,8 @@ namespace Mace
             base.Awake();
             particles = GetComponent<ParticleSystem>();
           
-            RegisterVariable<bool>(play).OnChanged(HandlePlayChange);
+            RegisterVariable<bool>(isPlaying).OnChanged(HandlePlayChange);
+            RegisterEvent<bool>(play).OnRaised(HandlePlayChange);
             RegisterVariable<Color>(color).OnChanged(HandleColorChange);
         }
         
