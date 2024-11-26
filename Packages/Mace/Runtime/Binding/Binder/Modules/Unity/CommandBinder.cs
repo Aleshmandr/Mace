@@ -11,6 +11,7 @@ namespace Mace
         protected override void Awake()
         {
             base.Awake();
+            commandExecuteTrigger = new UnityEvent();
             RegisterCommand(command).AddExecuteTrigger(commandExecuteTrigger);
         }
 
