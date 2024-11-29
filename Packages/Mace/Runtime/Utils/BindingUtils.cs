@@ -74,7 +74,7 @@ namespace Mace.Utils
 
 						if (genericType != null && genericType.GenericTypeArguments.Length > 0)
 						{
-							Type genericTypeDefinition = type.GetGenericTypeDefinition();
+							Type genericTypeDefinition = genericType.GetGenericTypeDefinition();
 							Type genericArgument = genericType.GenericTypeArguments[0];
 
 							LastObservableType = genericTypeDefinition;
