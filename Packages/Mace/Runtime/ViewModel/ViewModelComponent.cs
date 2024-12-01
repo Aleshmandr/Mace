@@ -7,13 +7,15 @@ namespace Mace
 {
 	public abstract class ViewModelComponent<T> : MonoBehaviour, IViewModelProvider<T> where T : IViewModel
 	{
+		public event ViewModelChangeEventHandler<T> ViewModelChanged;
+
 		[TypeConstraint(typeof(IViewModel), true)]
 		[SerializeField, HideInInspector] protected SerializableType expectedType;
 		[SerializeField, DisableAtRuntime] private string id;
+		private T viewModel;
 		
-		public event ViewModelChangeEventHandler<T> ViewModelChanged;
-
 		public virtual Type ExpectedType => expectedType.Type;
+		public string Id => id;
 
 		public T ViewModel
 		{
@@ -37,10 +39,6 @@ namespace Mace
 			}
 		}
 
-		public string Id => id;
-
-		private T viewModel;
-
 		protected virtual void Reset()
 		{
 			ResetId();
@@ -55,8 +53,11 @@ namespace Mace
 		{
 			EnsureId();
 		}
-		
-		protected virtual void OnEnable() {}
+
+		protected virtual void OnEnable()
+		{
+			ViewModel?.Enable();
+		}
 
 		protected virtual void OnDisable()
 		{
