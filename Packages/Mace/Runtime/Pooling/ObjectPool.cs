@@ -47,6 +47,7 @@ namespace Mace.Pooling
 		private bool isInitialized = false;
 		private Dictionary<GameObject, PoolData> cachedPools;
 		private Transform poolContainer;
+		private Queue<Transform> transformsToReparent = new ();
 
 		private void OnValidate()
 		{
@@ -145,7 +146,6 @@ namespace Mace.Pooling
 			if (!isInitialized && poolPrefabs != null)
 			{
 				isInitialized = true;
-				
 				foreach (GameObject objectToPool in poolPrefabs)
 				{
 					List<GameObject> prewarmedItems = prefabMap
@@ -187,6 +187,20 @@ namespace Mace.Pooling
 			}
 
 			return poolContainer;
+		}
+
+		private void Update()
+		{
+			while (transformsToReparent.Count > 0)
+			{
+				Transform t = transformsToReparent.Dequeue();
+				t.SetParent(transform, false);
+			}
+		}
+
+		public void EnqueueReparent(Transform t)
+		{
+			transformsToReparent.Enqueue(t);
 		}
 		
 #if UNITY_EDITOR

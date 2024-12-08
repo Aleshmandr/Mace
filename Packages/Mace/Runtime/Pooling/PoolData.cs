@@ -13,7 +13,6 @@ namespace Mace.Pooling
 		public int CurrentSize { get; private set; }
 		public Stack<PoolItem> Items { get; }
 
-
 		public PoolData(
 			ObjectPool pool,
 			GameObject original,
@@ -60,7 +59,7 @@ namespace Mace.Pooling
 
 		public void Recycle(PoolItem item, bool worldPositionStays)
 		{
-			if (item.Pool)
+			if (item.Pool != null)
 			{
 				if (item.Pool == Pool)
 				{
@@ -69,7 +68,7 @@ namespace Mace.Pooling
 						Items.Push(item);
 						item.OnRecycle();
 						item.gameObject.SetActive(false);
-						item.transform.SetParent(Pool.transform, false);
+						Pool.EnqueueReparent(item.transform);
 					}
 				}
 				else
