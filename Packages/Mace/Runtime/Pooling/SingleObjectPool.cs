@@ -3,20 +3,29 @@ using Mace.Utils.Singleton;
 
 namespace Mace.Pooling
 {
-	public class SingleObjectPool : PersistentMonoSingleton<SingleObjectPool>
+	internal class SingleObjectPool : PersistentMonoSingleton<SingleObjectPool>
 	{
-		private ObjectPool pool;
+		private GlobalPool pool;
+		public static bool IsDisposed;
 		
-		public ObjectPool GlobalPool
+		public GlobalPool GlobalPool
 		{
 			get
 			{
 				if (!pool)
 				{
-					pool = this.GetOrAddComponent<ObjectPool>();
+					pool = this.GetOrAddComponent<GlobalPool>();
 				}
 
 				return pool;
+			}
+		}
+
+		private void OnDestroy()
+		{
+			if (Instance == this)
+			{
+				IsDisposed = true;
 			}
 		}
 	}

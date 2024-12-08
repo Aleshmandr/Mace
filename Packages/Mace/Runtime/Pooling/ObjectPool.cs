@@ -24,29 +24,12 @@ namespace Mace.Pooling
         }
 
         private static readonly string PoolContainerName = "Pool";
-
-        private Dictionary<GameObject, PoolData> CachedPools
-        {
-            get
-            {
-                cachedPools ??= new Dictionary<GameObject, PoolData>();
-                InitializePools();
-                return cachedPools;
-            }
-        }
-
         [SerializeField] private int initialPoolSize = 5;
         [SerializeField] private int maxPoolSize = 20;
         [SerializeField] private List<GameObject> poolPrefabs;
         [SerializeField] private List<PrefabInstancesEntry> prefabMap;
 
-        private Transform PoolContainer => GetPoolContainer();
-
-        private bool isInitialized = false;
-        private Dictionary<GameObject, PoolData> cachedPools;
         private Transform poolContainer;
-        private readonly Queue<Transform> transformsToReparent = new();
-        private ObjectPool globalPool;
 
         private void OnValidate()
         {
@@ -57,6 +40,21 @@ namespace Mace.Pooling
         private void Awake()
         {
             InitializePools();
+        }
+
+        private void InitializePools()
+        {
+            if (poolPrefabs != null)
+            {
+                foreach (GameObject objectToPool in poolPrefabs)
+                {
+                    List<GameObject> prewarmedItems = prefabMap
+                        ?.Find(x => x.Prefab == objectToPool)
+                        ?.Instances;
+
+                    CreatePool(objectToPool, initialPoolSize, prewarmedItems);
+                }
+            }
         }
 
         public void CreatePool(GameObject original, int initialSize)
@@ -73,7 +71,7 @@ namespace Mace.Pooling
         {
             GameObject result = null;
 
-            if (globalPool.CachedPools.TryGetValue(original.gameObject, out PoolData pool))
+            if (SingleObjectPool.Instance.GlobalPool.CachedPools.TryGetValue(original.gameObject, out PoolData pool))
             {
                 result = pool.Spawn(parent, worldPositionStays);
             }
@@ -98,9 +96,14 @@ namespace Mace.Pooling
 
         public void Recycle(GameObject item, bool worldPositionStays = true)
         {
+            if (SingleObjectPool.IsDisposed)
+            {
+                return;
+            }
+
             PoolItem poolItem = item.GetComponent<PoolItem>();
 
-            if (poolItem && globalPool != null && globalPool.CachedPools.TryGetValue(poolItem.Original, out PoolData pool))
+            if (poolItem && SingleObjectPool.Instance.GlobalPool.CachedPools.TryGetValue(poolItem.Original, out PoolData pool))
             {
                 pool.Recycle(poolItem, worldPositionStays);
             }
@@ -123,12 +126,14 @@ namespace Mace.Pooling
             {
                 prefabMap = new List<PrefabInstancesEntry>();
 
+                Transform container = GetPoolContainer();
+
                 foreach (GameObject current in poolPrefabs)
                 {
                     if (current)
                     {
-                        List<GameObject> prefabInstances = GetExistingPrefabInstances(PoolContainer, current);
-                        AddMissingInstances(prefabInstances, current, PoolContainer);
+                        List<GameObject> prefabInstances = GetExistingPrefabInstances(container, current);
+                        AddMissingInstances(prefabInstances, current, container);
                         RemoveExtraInstances(prefabInstances);
                         prefabMap.Add(new PrefabInstancesEntry(current, prefabInstances));
                     }
@@ -137,25 +142,9 @@ namespace Mace.Pooling
 #endif
         }
 
-        private void InitializePools()
-        {
-            if (!isInitialized && poolPrefabs != null)
-            {
-                isInitialized = true;
-                globalPool = SingleObjectPool.Instance.GlobalPool;
-                foreach (GameObject objectToPool in poolPrefabs)
-                {
-                    List<GameObject> prewarmedItems = prefabMap
-                        ?.Find(x => x.Prefab == objectToPool)
-                        ?.Instances;
-
-                    CreatePool(objectToPool, initialPoolSize, prewarmedItems);
-                }
-            }
-        }
-
         private void CreatePool(GameObject original, int initialSize, IEnumerable<GameObject> prewarmedItems)
         {
+            var globalPool = SingleObjectPool.Instance.GlobalPool;
             if (globalPool.CachedPools.TryGetValue(original, out PoolData poolData))
             {
                 if (prewarmedItems != null)
@@ -186,18 +175,9 @@ namespace Mace.Pooling
             return poolContainer;
         }
 
-        private void Update()
+        public virtual void EnqueueReparent(Transform t)
         {
-            while (transformsToReparent.Count > 0)
-            {
-                Transform t = transformsToReparent.Dequeue();
-                t.SetParent(transform, false);
-            }
-        }
-
-        public void EnqueueReparent(Transform t)
-        {
-            transformsToReparent.Enqueue(t);
+            SingleObjectPool.Instance.GlobalPool.EnqueueReparent(t);
         }
 
 #if UNITY_EDITOR
