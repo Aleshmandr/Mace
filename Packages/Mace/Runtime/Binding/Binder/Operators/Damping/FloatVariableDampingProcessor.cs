@@ -1,9 +1,8 @@
 using UnityEngine;
-using Mace.Utils;
 
 namespace Mace
 {
-    public class FloatVariableDampingProcessor : VariableBindingProcessor<float, float>
+    public class FloatVariableDampingProcessor : VariableBindingProcessor<float, float>, IUpdatableBindingProcessor
     {
         private readonly float damping;
         private readonly bool useUnscaledTime;
@@ -21,16 +20,9 @@ namespace Mace
             base.Bind();
             dampedValue = variableBinding.Property.Value;
             currentVelocity = 0f;
-            LifecycleUtils.OnUpdate += Update;
         }
 
-        public override void Unbind()
-        {
-            base.Unbind();
-            LifecycleUtils.OnUpdate -= Update;
-        }
-
-        private void Update()
+        public void Update()
         {
             float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
             dampedValue = Mathf.SmoothDamp(dampedValue, variableBinding.Property.Value, ref currentVelocity, damping, float.MaxValue, dt);

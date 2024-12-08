@@ -13,7 +13,6 @@ namespace Mace.Pooling
 		public int CurrentSize { get; private set; }
 		public Stack<PoolItem> Items { get; }
 
-		private List<PoolItem> itemsToReparent;
 
 		public PoolData(
 			ObjectPool pool,
@@ -22,8 +21,6 @@ namespace Mace.Pooling
 			float growFactor,
 			IEnumerable<GameObject> prewarmedItems)
 		{
-			itemsToReparent = new List<PoolItem>();
-			
 			Pool = pool;
 			Original = original;
 			InitialPoolSize = initialPoolSize;
@@ -31,9 +28,6 @@ namespace Mace.Pooling
 			CurrentSize = 0;
 			Items = new Stack<PoolItem>();
 			CreatePool(prewarmedItems);
-			
-			LifecycleUtils.OnUpdate += Update;
-			// TODO find a way to unsubscribe from the Update event
 		}
 
 		public GameObject Spawn(Transform parent, bool worldPositionStays)
@@ -75,7 +69,7 @@ namespace Mace.Pooling
 						Items.Push(item);
 						item.OnRecycle();
 						item.gameObject.SetActive(false);
-						itemsToReparent.Add(item);
+						item.transform.SetParent(Pool.transform, false);
 					}
 				}
 				else
@@ -103,19 +97,6 @@ namespace Mace.Pooling
 			CurrentSize = mergedMaxPoolSize;
 		}
 		
-		private void Update()
-		{
-			foreach (PoolItem current in itemsToReparent)
-			{
-				if (current && current.IsActive == false)
-				{
-					current.transform.SetParent(Pool.transform, false);
-				}
-			}
-			
-			itemsToReparent.Clear();
-		}
-
 		private void CreatePool(IEnumerable<GameObject> prewarmedItems)
 		{
 			if (prewarmedItems != null)

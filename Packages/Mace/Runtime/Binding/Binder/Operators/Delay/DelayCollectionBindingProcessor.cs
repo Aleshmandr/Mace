@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Mace.Utils;
 
 namespace Mace
 {
-	public class DelayCollectionBindingProcessor<T> : CollectionBindingProcessor<T, T>
+	public class DelayCollectionBindingProcessor<T> : CollectionBindingProcessor<T, T>, IUpdatableBindingProcessor
 	{
 		private readonly Queue<ActionCommand> actionQueue;
 		private readonly float delay;
@@ -17,16 +16,9 @@ namespace Mace
 			this.delay = delay;
 		}
 
-		public override void Bind()
-		{
-			LifecycleUtils.OnUpdate += Update;
-			base.Bind();
-		}
-
 		public override void Unbind()
 		{
 			actionQueue.Clear();
-			LifecycleUtils.OnUpdate -= Update;
 			base.Unbind();
 		}
 
@@ -60,7 +52,7 @@ namespace Mace
 			return newValue;
 		}
 		
-		private void Update()
+		public void Update()
 		{
 			while (actionQueue.Count > 0 && Time.realtimeSinceStartup >= actionQueue.Peek().DueTime)
 			{
