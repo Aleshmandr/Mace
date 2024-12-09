@@ -1,5 +1,6 @@
 using Mace.Utils;
 using Mace.Utils.Singleton;
+using UnityEngine;
 
 namespace Mace.Pooling
 {
@@ -15,11 +16,18 @@ namespace Mace.Pooling
 				if (!pool)
 				{
 					pool = this.GetOrAddComponent<GlobalPool>();
+					IsDisposed = false;
 				}
 
 				return pool;
 			}
 		}
+		
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void InitializeOnLoad()
+        {
+        	IsDisposed = false;
+        }
 
 		private void OnDestroy()
 		{
