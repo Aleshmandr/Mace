@@ -26,15 +26,15 @@ namespace Mace
 				{
 					if (viewModel != null && !viewModel.IsEnabled)
 					{
-						viewModel?.Enable();
+						OnViewModelEnable();
 					}
 					return;
 				}
 				
-				viewModel?.Disable();
+				OnViewModelDisable();
 				T lastViewModel = viewModel;
 				viewModel = value;
-				viewModel?.Enable();
+				OnViewModelEnable();
 				OnViewModelChanged(lastViewModel, viewModel);
 			}
 		}
@@ -56,10 +56,20 @@ namespace Mace
 
 		protected virtual void OnEnable()
 		{
-			ViewModel?.Enable();
+			OnViewModelEnable();
 		}
 
 		protected virtual void OnDisable()
+		{
+			OnViewModelDisable();
+		}
+		
+		protected virtual void OnViewModelEnable()
+		{
+			ViewModel?.Enable();
+		}
+
+		protected virtual void OnViewModelDisable()
 		{
 			ViewModel?.Disable();
 		}
