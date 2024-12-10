@@ -1,4 +1,6 @@
-﻿namespace Mace
+﻿using UnityEngine;
+
+namespace Mace
 {
     public class ParentViewModelReference : ViewModelComponent
     {
@@ -7,11 +9,18 @@
         protected override void OnEnable()
         {
             base.OnEnable();
-            parentViewModel = GetComponentInParent<ViewModelComponent>();
-            if (parentViewModel != null)
+            Transform parent = transform.parent;
+            while (parent != null)
             {
-                ViewModel = parentViewModel.ViewModel;
-                parentViewModel.ViewModelChanged += HandleParentViewModelChange;
+                parentViewModel = parent.GetComponent<ViewModelComponent>();
+                if (parentViewModel != null && parentViewModel.ExpectedType == ExpectedType)
+                {
+                    ViewModel = parentViewModel.ViewModel;
+                    parentViewModel.ViewModelChanged += HandleParentViewModelChange;
+                    break;
+                }
+
+                parent = parent.parent;
             }
         }
 
