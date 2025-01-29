@@ -11,7 +11,7 @@ namespace Mace
     public class ParticleSystemBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo isPlaying = BindingInfo.Variable<bool>();
-        [SerializeField] private BindingInfo play = BindingInfo.Event<bool>();
+        [SerializeField] private BindingInfo play = BindingInfo.Event();
         [SerializeField] private BindingInfo color = BindingInfo.Variable<Color>();
         private ParticleSystem particles;
 
@@ -19,9 +19,8 @@ namespace Mace
         {
             base.Awake();
             particles = GetComponent<ParticleSystem>();
-          
             RegisterVariable<bool>(isPlaying).OnChanged(HandlePlayChange);
-            RegisterEvent<bool>(play).OnRaised(HandlePlayChange);
+            RegisterEvent(play).OnRaised(HandlePlayEventRaise);
             RegisterVariable<Color>(color).OnChanged(HandleColorChange);
         }
         
@@ -35,6 +34,11 @@ namespace Mace
             {
                 particles.Stop(true);
             }
+        }
+        
+        private void HandlePlayEventRaise()
+        {
+            particles.Play(true);
         }
 
         private void HandleColorChange(Color color)
