@@ -40,7 +40,7 @@ namespace Mace.Editor
 
 		public static class ContentIcons
 		{
-			public static GUIContent Unlink => new GUIContent(Icons.Unlink);
+			public static readonly GUIContent Unlink = new GUIContent(Icons.Unlink);
 		}
 	}
 }
