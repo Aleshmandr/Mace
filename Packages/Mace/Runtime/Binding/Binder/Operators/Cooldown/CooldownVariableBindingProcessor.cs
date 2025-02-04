@@ -2,36 +2,60 @@
 
 namespace Mace
 {
-	public class CooldownVariableBindingProcessor<T> : VariableBindingProcessor<T, T>
-	{
-		private readonly float cooldown;
-		private float lastChangeTime;
-		
-		public CooldownVariableBindingProcessor(BindingInfo bindingInfo, Component viewModel, float cooldown)
-			: base(bindingInfo, viewModel)
-		{
-			this.cooldown = cooldown;
-			lastChangeTime = -cooldown;
-		}
+    public class CooldownVariableBindingProcessor<T> : VariableBindingProcessor<T, T>, IUpdatableBindingProcessor
+    {
+        private readonly float cooldown;
+        private float lastChangeTime;
+        private float pendingValueUpdateTimer;
+        private T pendingValue;
 
-		public override void Bind()
-		{
-			lastChangeTime = -cooldown;
-			base.Bind();
-		}
+        public CooldownVariableBindingProcessor(BindingInfo bindingInfo, Component viewModel, float cooldown)
+            : base(bindingInfo, viewModel)
+        {
+            this.cooldown = cooldown;
+            lastChangeTime = -cooldown;
+        }
 
-		protected override void OnBoundVariableChanged(T newValue)
-		{
-			if (Time.unscaledTime - lastChangeTime >= cooldown)
-			{
-				lastChangeTime = Time.unscaledTime;
-				base.OnBoundVariableChanged(newValue);
-			}
-		}
+        public override void Bind()
+        {
+            lastChangeTime = -cooldown;
+            base.Bind();
+        }
 
-		protected override T ProcessValue(T value)
-		{
-			return value;
-		}
-	}
+        public void Update()
+        {
+            if (pendingValueUpdateTimer <= 0f)
+            {
+                return;
+            }
+
+            pendingValueUpdateTimer -= Time.unscaledDeltaTime;
+            if (pendingValueUpdateTimer <= 0f)
+            {
+                lastChangeTime = Time.unscaledTime;
+                base.OnBoundVariableChanged(pendingValue);
+            }
+        }
+
+        protected override void OnBoundVariableChanged(T newValue)
+        {
+            float passedTime = Time.unscaledTime - lastChangeTime;
+            if (passedTime >= cooldown)
+            {
+                lastChangeTime = Time.unscaledTime;
+                pendingValueUpdateTimer = 0f;
+                base.OnBoundVariableChanged(newValue);
+            }
+            else
+            {
+                pendingValueUpdateTimer = cooldown - passedTime;
+                pendingValue = newValue;
+            }
+        }
+
+        protected override T ProcessValue(T value)
+        {
+            return value;
+        }
+    }
 }

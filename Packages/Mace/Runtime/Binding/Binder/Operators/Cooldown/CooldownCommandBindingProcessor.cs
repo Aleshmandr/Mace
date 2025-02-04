@@ -2,10 +2,12 @@
 
 namespace Mace
 {
-    public class CooldownCommandBindingProcessor<T> : CommandBindingProcessor<T, T>
+    public class CooldownCommandBindingProcessor<T> : CommandBindingProcessor<T, T>, IUpdatableBindingProcessor
     {
         private readonly float cooldown;
         private float lastExecutionRequestTime;
+        private float pendingValueUpdateTimer;
+        private T pendingParameter;
 
         public CooldownCommandBindingProcessor(BindingInfo bindingInfo, Component viewModel, float cooldown)
             : base(bindingInfo, viewModel)
@@ -20,12 +22,33 @@ namespace Mace
             base.Bind();
         }
 
+        public void Update()
+        {
+            if (pendingValueUpdateTimer <= 0f)
+            {
+                return;
+            }
+
+            pendingValueUpdateTimer -= Time.unscaledDeltaTime;
+            if (pendingValueUpdateTimer <= 0f)
+            {
+                lastExecutionRequestTime = Time.unscaledTime;
+                base.ProcessedCommandExecuteRequestedHandler(pendingParameter);
+            }
+        }
+
         protected override void ProcessedCommandExecuteRequestedHandler(T parameter)
         {
-            if (Time.unscaledTime - lastExecutionRequestTime >= cooldown)
+            float passedTime = Time.unscaledTime - lastExecutionRequestTime;
+            if (passedTime >= cooldown)
             {
                 lastExecutionRequestTime = Time.unscaledTime;
                 base.ProcessedCommandExecuteRequestedHandler(parameter);
+            }
+            else
+            {
+                pendingValueUpdateTimer = cooldown - passedTime;
+                pendingParameter = parameter;
             }
         }
 

@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
 namespace Mace
 {
     public class CooldownOperator<T> : ProcessorOperator<T, T>
     {
-        private static readonly BindingType[] AllowedTypesStatic = 
+        private static readonly BindingType[] AllowedTypesStatic =
         {
             BindingType.Variable,
             BindingType.Command,
@@ -12,30 +13,36 @@ namespace Mace
         };
 
         [SerializeField] private float cooldown = 1f;
+        private IUpdatableBindingProcessor updatableBindingProcessor;
 
         protected override BindingType[] AllowedTypes => AllowedTypesStatic;
 
         protected override IBindingProcessor GetBindingProcessor(BindingType bindingType, BindingInfo fromBinding)
         {
-            IBindingProcessor result = null;
-			
             switch (bindingType)
             {
                 case BindingType.Variable:
-                    result = new CooldownVariableBindingProcessor<T>(fromBinding, this, cooldown);
+                    var cooldownVariableBindingProcessor = new CooldownVariableBindingProcessor<T>(fromBinding, this, cooldown);
+                    updatableBindingProcessor = cooldownVariableBindingProcessor;
                     break;
                 case BindingType.Collection:
+                    updatableBindingProcessor = null;
                     Debug.LogError("Collection cooldown is not supported", this);
                     break;
                 case BindingType.Command:
-                    result = new CooldownCommandBindingProcessor<T>(fromBinding, this, cooldown);
+                    updatableBindingProcessor = new CooldownCommandBindingProcessor<T>(fromBinding, this, cooldown);
                     break;
                 case BindingType.Event:
-                    result = new CooldownEventBindingProcessor<T>(fromBinding, this, cooldown);
+                    updatableBindingProcessor = new CooldownEventBindingProcessor<T>(fromBinding, this, cooldown);
                     break;
             }
 
-            return result;
+            return updatableBindingProcessor;
+        }
+
+        private void Update()
+        {
+            updatableBindingProcessor?.Update();
         }
     }
 }
