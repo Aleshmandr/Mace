@@ -10,6 +10,7 @@ namespace Mace
 
 		[SerializeField] private BindingInfo collection = BindingInfo.Collection<object>();
 		[SerializeField] private Transform itemsContainer;
+		[SerializeField] private int startSiblingIndex;
 		[Header("Dependencies")]
 		[SerializeField] protected ItemPicker itemPicker;
 
@@ -88,7 +89,7 @@ namespace Mace
 		{
 			ViewModelComponent newItem = itemPicker.SpawnItem(index, value, Container);
 			currentItems.Insert(index, newItem);
-			newItem.transform.SetSiblingIndex(index);
+			newItem.transform.SetSiblingIndex(index + startSiblingIndex);
 			newItem.ViewModel = value;
 		}
 
@@ -97,7 +98,7 @@ namespace Mace
 			ViewModelComponent item = currentItems[oldIndex];
 			currentItems.RemoveAt(oldIndex);
 			currentItems.Insert(newIndex, item);
-			item.transform.SetSiblingIndex(newIndex);
+			item.transform.SetSiblingIndex(newIndex + startSiblingIndex);
 		}
 	}
 }

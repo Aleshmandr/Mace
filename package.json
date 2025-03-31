@@ -1,6 +1,6 @@
 {
   "name": "com.aleshmandr.mace",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "displayName": "Mace",
   "description": "A MVVM framework for Unity",
   "unity": "2019.4",
