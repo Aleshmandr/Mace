@@ -9,6 +9,7 @@ namespace Mace
 		public IReadOnlyList<ViewModelComponent> Items => currentItems;
 
 		[SerializeField] private BindingInfo collection = BindingInfo.Collection<object>();
+		[SerializeField] private bool keepBindingActiveWhileDisabled;
 		[SerializeField] private Transform itemsContainer;
 		[SerializeField] private int startSiblingIndex;
 		[Header("Dependencies")]
@@ -38,6 +39,40 @@ namespace Mace
 				.OnItemMoved(OnCollectionItemMoved)
 				.OnItemRemoved(OnCollectionItemRemoved)
 				.OnItemReplaced(OnCollectionItemReplaced);
+			
+			if (keepBindingActiveWhileDisabled)
+			{
+				Bind();
+			}
+		}
+
+		protected override void OnEnable()
+		{
+			if (keepBindingActiveWhileDisabled)
+			{
+				return;
+			}
+
+			Bind();
+		}
+
+		protected override void OnDisable()
+		{
+			if (keepBindingActiveWhileDisabled)
+			{
+				return;
+			}
+
+			Unbind();
+		}
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+			if (keepBindingActiveWhileDisabled)
+			{
+				Unbind();
+			}
 		}
 
 		protected virtual void OnCollectionReset()

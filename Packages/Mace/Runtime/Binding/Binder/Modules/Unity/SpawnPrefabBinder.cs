@@ -8,6 +8,7 @@ namespace Mace
     public class SpawnPrefabBinder : ComponentBinder
     {
         [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
+        [SerializeField] private bool keepBindingActiveWhileDisabled;
         [SerializeField] private List<ViewModelComponent> prefabs;
         [SerializeField] private Transform parent;
         [SerializeField] private ObjectPool pool;
@@ -15,13 +16,13 @@ namespace Mace
         private PrefabPicker<ViewModelComponent> prefabPicker;
         private ViewModelComponent currentItem;
         private bool isInitialized;
-        
+
         private Transform Parent => parent ? parent : transform;
 
         protected override void Awake()
         {
             base.Awake();
-            
+
             RegisterVariable<object>(objectToInstantiate)
                 .OnChanged(OnObjectChanged)
                 .OnCleared(OnObjectCleared);
@@ -30,15 +31,49 @@ namespace Mace
             currentItem = null;
 
             FillPool();
+
+            if (keepBindingActiveWhileDisabled)
+            {
+                Bind();
+            }
         }
-        
+
+        protected override void OnEnable()
+        {
+            if (keepBindingActiveWhileDisabled)
+            {
+                return;
+            }
+
+            Bind();
+        }
+
+        protected override void OnDisable()
+        {
+            if (keepBindingActiveWhileDisabled)
+            {
+                return;
+            }
+
+            Unbind();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (keepBindingActiveWhileDisabled)
+            {
+                Unbind();
+            }
+        }
+
         private void FillPool()
         {
             if (pool == null)
             {
                 return;
             }
-            
+
             foreach (ViewModelComponent prefab in prefabs)
             {
                 pool.CreatePool(prefab, 1);
@@ -56,7 +91,7 @@ namespace Mace
                     currentItem = SpawnItem(bestPrefab, Parent);
                 }
 
-                currentItem.ViewModel = (IViewModel) value;
+                currentItem.ViewModel = (IViewModel)value;
             }
             else
             {
