@@ -6,23 +6,24 @@ namespace Mace
 	public class EnableBehaviourBinder : ComponentBinder
 	{
 		[SerializeField] private BindingInfo isEnabled = BindingInfo.Variable<bool>();
-		[SerializeField] private List<Behaviour> targets;
+		[SerializeField] private List<EnableBehaviourData> targets;
 
 		protected override void Awake()
 		{
 			base.Awake();
-
 			RegisterVariable<bool>(isEnabled).OnChanged(Refresh);
 		}
 
 		private void Refresh(bool value)
 		{
-			foreach (Behaviour current in targets)
+			foreach (var current in targets)
 			{
-				if (current)
+				if (current.Target == null)
 				{
-					current.enabled = value;
+					continue;
 				}
+				
+				current.Target.enabled = current.Invert ? !value : value;
 			}
 		}
 	}
