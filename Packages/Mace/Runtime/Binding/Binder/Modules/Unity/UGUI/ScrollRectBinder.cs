@@ -12,7 +12,6 @@ namespace Mace
         [SerializeField] private BindingInfo focusItem = BindingInfo.Variable<object>();
         [SerializeField] private Vector2 focusMargin;
         private ScrollRect scrollRect;
-        private object currentItem;
 
         protected override void Awake()
         {
@@ -21,16 +20,13 @@ namespace Mace
             RegisterVariable<object>(focusItem).OnChanged(OnItemChanged);
         }
 
-        private void RefreshFocus()
+        private void OnItemChanged(object itemViewModel)
         {
-            if (currentItem != null)
+            if (itemViewModel == null)
             {
-                UpdateScrollFocus(currentItem);
+                return;
             }
-        }
 
-        private void UpdateScrollFocus(object itemViewModel)
-        {
             RectTransform parentTransform = scrollRect.content;
             int childCount = parentTransform.childCount;
             for (int i = 0; i < childCount; i++)
@@ -43,12 +39,6 @@ namespace Mace
                     return;
                 }
             }
-        }
-
-        private void OnItemChanged(object newValue)
-        {
-            currentItem = newValue;
-            RefreshFocus();
         }
 
 #if UNITY_EDITOR

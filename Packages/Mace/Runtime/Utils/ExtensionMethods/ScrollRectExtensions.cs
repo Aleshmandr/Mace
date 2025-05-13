@@ -11,8 +11,9 @@ namespace Mace.Utils
             {
                 return;
             }
-            
+
             Canvas.ForceUpdateCanvases();
+            scrollRect.StopMovement();
 
             // Get min and max of the viewport and child in local space to the viewport so we can compare them.
             // NOTE: use viewport instead of the scrollRect as viewport doesn't include the scrollbars in it.
@@ -52,6 +53,9 @@ namespace Mace.Utils
             // Transform the move vector to world space, then to content local space (in case of scaling or rotation?) and apply it.
             Vector3 worldMove = scrollRect.viewport.TransformDirection(move);
             scrollRect.content.localPosition -= scrollRect.content.InverseTransformDirection(worldMove);
+
+            Vector2 rawNormalizedPosition = scrollRect.normalizedPosition;
+            scrollRect.normalizedPosition = new Vector2(Mathf.Clamp01(rawNormalizedPosition.x), Mathf.Clamp01(rawNormalizedPosition.y));
         }
     }
 }
