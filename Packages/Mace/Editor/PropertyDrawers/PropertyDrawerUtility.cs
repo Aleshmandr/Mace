@@ -41,9 +41,10 @@ namespace Mace.Editor
 		{
 			// Getting the field type this way assumes that the property instance is not a managed reference (with a SerializeReference attribute); if it was, it should be retrieved in a different way:
 			Type fieldType = fieldInfo.FieldType;
-
 			
-#if UNITY_2022_1_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
+			var parameters = new object[] { fieldType, null, false };
+#elif UNITY_2022_1_OR_NEWER
 			var parameters = new object[] { fieldType, false };
 #else
 			var parameters = new object[] { fieldType };
