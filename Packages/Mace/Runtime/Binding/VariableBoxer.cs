@@ -14,7 +14,7 @@
 		{
 			this.boxedVariable = boxedVariable;
 			boxedVariable.Changed += OnBoxedVariableChanged;
-			boxedVariable.Cleared -= OnBoxedVariableCleared;
+			boxedVariable.Cleared += OnBoxedVariableCleared;
 		}
 
 		public TExposed GetValue(TExposed fallback)

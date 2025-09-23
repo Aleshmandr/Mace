@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine.Assertions;
+using UnityEngine;
 
 namespace Mace
 {
@@ -24,8 +24,15 @@ namespace Mace
 
 		public void SetPrefabs(List<T> prefabs)
 		{
-			prefabs?.ForEach(x => Assert.IsNotNull(x.ExpectedType, $"{x.name}'s expected type is not valid. It must derive {ExpectedViewModelType}."));
-
+#if UNITY_EDITOR || UNITY_DEVELOPMENT_BUILD
+			prefabs?.ForEach(x =>
+			{
+				if (x.ExpectedType == null)
+				{
+					Debug.LogError($"{x.name}'s expected type is not valid. It must derive {ExpectedViewModelType}.");
+				}
+			});
+#endif
 			this.prefabs = prefabs;
 			prefabResolutionCache.Clear();
 		}
