@@ -2,10 +2,14 @@
 {
     public abstract class ViewModel : IViewModel
     {
+        private int activeRefCount;
+        
         public bool IsEnabled { get; private set; }
 
         public void Enable()
         {
+            activeRefCount++;
+            
             if (IsEnabled)
             {
                 return;
@@ -18,6 +22,13 @@
         public void Disable()
         {
             if (!IsEnabled)
+            {
+                return;
+            }
+            
+            activeRefCount--;
+
+            if (activeRefCount > 0)
             {
                 return;
             }

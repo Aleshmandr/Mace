@@ -24,7 +24,7 @@ namespace Mace
 			{
 				if (ReferenceEquals(value, viewModel))
 				{
-					if (viewModel != null && !viewModel.IsEnabled)
+					if (viewModel != null && !viewModel.IsEnabled && isActiveAndEnabled)
 					{
 						viewModel?.Enable();
 					}
@@ -34,7 +34,10 @@ namespace Mace
 				viewModel?.Disable();
 				T lastViewModel = viewModel;
 				viewModel = value;
-				viewModel?.Enable();
+                if (isActiveAndEnabled)
+                {
+				    viewModel?.Enable();
+                }
 				OnViewModelChanged(lastViewModel, viewModel);
 			}
 		}
