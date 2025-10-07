@@ -6,6 +6,7 @@ namespace Mace
     {
         private readonly float damping;
         private readonly bool useUnscaledTime;
+        private bool isDampedValueInitialized;
         private float dampedValue;
         private float currentVelocity;
 
@@ -18,12 +19,18 @@ namespace Mace
         public override void Bind()
         {
             base.Bind();
-            dampedValue = variableBinding.Property.Value;
-            currentVelocity = 0;
+            isDampedValueInitialized = false;
         }
 
         public void Update()
         {
+            if (!isDampedValueInitialized)
+            {
+                dampedValue = variableBinding.Property.Value;
+                currentVelocity = 0;
+                isDampedValueInitialized = true;
+            }
+            
             float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
             dampedValue = Mathf.SmoothDamp(dampedValue, variableBinding.Property.Value, ref currentVelocity, damping, float.MaxValue, dt);
             OnBoundVariableChanged(Mathf.RoundToInt(dampedValue));
