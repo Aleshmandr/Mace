@@ -21,7 +21,7 @@ namespace Mace
 			base.Awake();
 
 			result = new ObservableVariable<bool>();
-			ViewModel = new OperatorVariableViewModel<bool>(result);;
+			ViewModel = new OperatorVariableViewModel<bool>(result);
 
 			operandABinding = RegisterVariable<int>(operandA).OnChanged(OnOperandChanged).GetBinding();
 			operandBBinding = RegisterVariable<int>(operandB).OnChanged(OnOperandChanged).GetBinding();
