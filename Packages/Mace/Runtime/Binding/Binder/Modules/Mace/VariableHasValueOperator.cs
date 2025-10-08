@@ -21,12 +21,13 @@ namespace Mace
 				.OnChanged(OnVariableChanged)
 				.OnCleared(OnVariableCleared)
 				.GetBinding();
+			
+			Refresh();
 		}
 
 		protected override void OnDisable()
 		{
 			base.OnDisable();
-
 			exposedVariable.Value = false;
 		}
 
