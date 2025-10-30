@@ -39,9 +39,14 @@ namespace Mace
 
 		public T FindBestPrefab(object value)
 		{
+			if (value == null)
+			{
+				return null;
+			}
+			
 			Type valueType = value.GetType();
 
-			if (prefabResolutionCache.TryGetValue(valueType, out var result) == false)
+			if (!prefabResolutionCache.TryGetValue(valueType, out var result))
 			{
 				result = FindBestPrefab(valueType);
 

@@ -82,6 +82,12 @@ namespace Mace
 
         private void OnObjectChanged(object value)
         {
+            if (value == null)
+            {
+                Clear();
+                return;
+            }
+            
             ViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
 
             if (bestPrefab)
@@ -96,7 +102,6 @@ namespace Mace
             else
             {
                 Clear();
-
                 Debug.LogError($"A matching prefab could not be found for {value} ({value.GetType().GetPrettifiedName()})");
             }
         }
