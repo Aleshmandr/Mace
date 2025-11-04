@@ -24,7 +24,7 @@ namespace Mace
 
         protected override void OnEnable()
         {
-            base.OnEnable();
+            // base.OnEnable() is intentionally skipped because SetData() handles proper view model binding
             binding.Property.Changed += SetData;
             binding.Bind();
             SetData(binding.Property.Value);
@@ -32,9 +32,10 @@ namespace Mace
 
         protected override void OnDisable()
         {
-            base.OnDisable();
+            // base.OnDisable() is intentionally skipped because SetData() handles proper view model unbinding
             binding.Property.Changed -= SetData;
             binding.Unbind();
+            SetData(null);
         }
 
         public void SetData(object data)
@@ -47,7 +48,8 @@ namespace Mace
                 Debug.LogError("Expected Type must be set", this);
             }
         }
-
+        
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -64,5 +66,6 @@ namespace Mace
                 }
             }
         }
+#endif
     }
 }
