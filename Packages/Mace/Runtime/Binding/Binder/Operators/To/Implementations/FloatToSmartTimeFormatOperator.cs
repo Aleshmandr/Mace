@@ -11,6 +11,7 @@ namespace Mace
         [SerializeField] private BindingInfo fromSeconds = BindingInfo.Variable<float>();
         [SerializeField] [Min(1)] private int valuesToShow = 3;
         [SerializeField] private bool trimLeadingZeros;
+        [SerializeField] private string separator = " ";
         [SerializeField] private ConstantBindingInfo<string> daysFormat = new();
         [SerializeField] private ConstantBindingInfo<string> hoursFormat = new();
         [SerializeField] private ConstantBindingInfo<string> minutesFormat = new();
@@ -271,9 +272,10 @@ namespace Mace
             for (int i = 0; i < partsCount; i++)
             {
                 stringBuilder.Append(buffer[i].Text);
+                stringBuilder.Append(separator);
             }
 
-            exposedProperty.Value = stringBuilder.ToString();
+            exposedProperty.Value = stringBuilder.ToString().Trim();
         }
 
         private bool HasFormat(int index)
