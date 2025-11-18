@@ -4,152 +4,154 @@ using UnityEngine;
 
 namespace Mace.Pooling
 {
-	internal class PoolData
-	{
-		public ObjectPool Pool { get; }
-		public GameObject Original { get; }
-		public int InitialPoolSize { get; }
-		public float GrowFactor { get; }
-		public int CurrentSize { get; private set; }
-		public Stack<PoolItem> Items { get; }
+    internal class PoolData
+    {
+        public ObjectPool Pool { get; }
+        public GameObject Original { get; }
+        public int InitialPoolSize { get; }
+        public float GrowFactor { get; }
+        public int CurrentSize { get; private set; }
+        public Stack<PoolItem> Items { get; }
 
-		public PoolData(
-			ObjectPool pool,
-			GameObject original,
-			int initialPoolSize,
-			float growFactor,
-			IEnumerable<GameObject> prewarmedItems)
-		{
-			Pool = pool;
-			Original = original;
-			InitialPoolSize = initialPoolSize;
-			GrowFactor = growFactor;
-			CurrentSize = 0;
-			Items = new Stack<PoolItem>();
-			CreatePool(prewarmedItems);
-		}
+        public PoolData(
+            ObjectPool pool,
+            GameObject original,
+            int initialPoolSize,
+            float growFactor,
+            IEnumerable<GameObject> prewarmedItems)
+        {
+            Pool = pool;
+            Original = original;
+            InitialPoolSize = initialPoolSize;
+            GrowFactor = growFactor;
+            CurrentSize = 0;
+            Items = new Stack<PoolItem>();
+            CreatePool(prewarmedItems);
+        }
 
-		public GameObject Spawn(Transform parent, bool worldPositionStays)
-		{
-			GameObject result = null;
+        public GameObject Spawn(Transform parent, bool worldPositionStays)
+        {
+            GameObject result;
 
-			if (Items.Count <= 0)
-			{
-				GrowPool();
-			}
+            if (Items.Count <= 0)
+            {
+                GrowPool();
+            }
 
-			PoolItem item = Items.Pop();
+            PoolItem item = Items.Pop();
 
-			if (item)
-			{
-				item.transform.SetParent(parent, worldPositionStays);
-				item.gameObject.SetActive(true);
-				item.OnSpawn();
-				result = item.gameObject;
-			}
-			else
-			{
-				CurrentSize--;
-				result = Spawn(parent, worldPositionStays);
-			}
-			
-			result.transform.SetAsLastSibling();
-			return result;
-		}
+            if (item != null)
+            {
+                item.transform.SetParent(parent, worldPositionStays);
+                item.gameObject.SetActive(true);
+                item.OnSpawn();
+                result = item.gameObject;
+            }
+            else
+            {
+                CurrentSize--;
+                result = Spawn(parent, worldPositionStays);
+            }
 
-		public void Recycle(PoolItem item, bool worldPositionStays)
-		{
-			if (item.Pool != null)
-			{
-				if (item.Pool == Pool)
-				{
-					if (Items.Contains(item) == false)
-					{
-						Items.Push(item);
-						item.OnRecycle();
-						item.gameObject.SetActive(false);
-						Pool.EnqueueReparent(item.transform);
-					}
-				}
-				else
-				{
-					item.Pool.Recycle(item.gameObject, worldPositionStays);
-				}
-			}
-			else
-			{
-				Object.Destroy(item.gameObject);
-			}
-		}
+            result.transform.SetAsLastSibling();
+            return result;
+        }
 
-		public void Merge(int maxPoolSize, IEnumerable<GameObject> prewarmedItems)
-		{
-			int mergedMaxPoolSize = Mathf.Max(Mathf.CeilToInt(InitialPoolSize * GrowFactor), CurrentSize, maxPoolSize);
+        public void Recycle(PoolItem item, bool worldPositionStays)
+        {
+            if (item.Pool != null)
+            {
+                if (item.Pool == Pool)
+                {
+                    if (!Items.Contains(item))
+                    {
+                        Items.Push(item);
+                        item.OnRecycle();
+                        item.gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    item.Pool.Recycle(item.gameObject, worldPositionStays);
+                }
+            }
+            else
+            {
+                Object.Destroy(item.gameObject);
+            }
+        }
 
-			var enumerator = prewarmedItems.GetEnumerator();
+        public void Merge(int maxPoolSize, IEnumerable<GameObject> prewarmedItems)
+        {
+            int mergedMaxPoolSize = Mathf.Max(Mathf.CeilToInt(InitialPoolSize * GrowFactor), CurrentSize, maxPoolSize);
 
-			while (CurrentSize < mergedMaxPoolSize && enumerator.MoveNext())
-			{
-				AddPrewarmedItem(enumerator.Current);
-			}
+            foreach (var item in prewarmedItems)
+            {
+                if (CurrentSize >= mergedMaxPoolSize)
+                {
+                    break;
+                }
 
-			CurrentSize = mergedMaxPoolSize;
-		}
-		
-		private void CreatePool(IEnumerable<GameObject> prewarmedItems)
-		{
-			if (prewarmedItems != null)
-			{
-				foreach (GameObject current in prewarmedItems)
-				{
-					AddPrewarmedItem(current);
-				}
-			}
-			
-			for (int i = Items.Count; i < InitialPoolSize; i++)
-			{
-				AddNewItem();
-			}
+                AddPrewarmedItem(item);
+            }
 
-			CurrentSize = Items.Count;
-		}
+            CurrentSize = mergedMaxPoolSize;
+        }
 
-		private void GrowPool()
-		{
-			int newItemsCount = Mathf.Max(Mathf.RoundToInt(InitialPoolSize * GrowFactor), 1);
+        private void CreatePool(IEnumerable<GameObject> prewarmedItems)
+        {
+            if (prewarmedItems != null)
+            {
+                foreach (GameObject current in prewarmedItems)
+                {
+                    AddPrewarmedItem(current);
+                }
+            }
 
-			for (int i = 0; i < newItemsCount; i++)
-			{
-				AddNewItem();
-			}
+            for (int i = Items.Count; i < InitialPoolSize; i++)
+            {
+                AddNewItem();
+            }
 
-			if (GrowFactor > 0)
-			{
-				CurrentSize += newItemsCount;
-			}
-		}
+            CurrentSize = Items.Count;
+        }
 
-		private void AddPrewarmedItem(GameObject item)
-		{
-			PoolItem newItem = SetupItem(item);
-			item.transform.SetParent(Pool.transform, false);
-			Items.Push(newItem);
-		}
-		
-		private void AddNewItem()
-		{
-			GameObject newObject = Object.Instantiate(Original, Pool.transform);
-			PoolItem newItem = SetupItem(newObject);
-			Items.Push(newItem);
-		}
+        private void GrowPool()
+        {
+            int newItemsCount = Mathf.Max(Mathf.RoundToInt(InitialPoolSize * GrowFactor), 1);
 
-		private PoolItem SetupItem(GameObject source)
-		{
-			PoolItem result = source.GetOrAddComponent<PoolItem>();
-			result.Original = Original;
-			result.Pool = Pool;
-			source.SetActive(false);
-			return result;
-		}
-	}
+            for (int i = 0; i < newItemsCount; i++)
+            {
+                AddNewItem();
+            }
+
+            if (GrowFactor > 0)
+            {
+                CurrentSize += newItemsCount;
+            }
+        }
+
+        private void AddPrewarmedItem(GameObject item)
+        {
+            PoolItem newItem = SetupItem(item);
+            item.transform.SetParent(Pool.transform, false);
+            Items.Push(newItem);
+        }
+
+        private void AddNewItem()
+        {
+            GameObject newObject = Object.Instantiate(Original, Pool.transform);
+            PoolItem newItem = SetupItem(newObject);
+            Items.Push(newItem);
+        }
+
+        private PoolItem SetupItem(GameObject source)
+        {
+            PoolItem result = source.GetOrAddComponent<PoolItem>();
+            result.Original = Original;
+            result.Pool = Pool;
+            source.SetActive(false);
+            return result;
+        }
+    }
 }

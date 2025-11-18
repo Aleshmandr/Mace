@@ -28,6 +28,7 @@ namespace Mace.Pooling
         [SerializeField] private int maxPoolSize = 20;
         [SerializeField] private List<GameObject> poolPrefabs;
         [SerializeField] private List<PrefabInstancesEntry> prefabMap;
+        private Dictionary<GameObject, PoolData> cachedPools;
 
         private Transform poolContainer;
 
@@ -44,6 +45,7 @@ namespace Mace.Pooling
 
         private void InitializePools()
         {
+            cachedPools = new Dictionary<GameObject, PoolData>();
             if (poolPrefabs != null)
             {
                 foreach (GameObject objectToPool in poolPrefabs)
@@ -71,7 +73,7 @@ namespace Mace.Pooling
         {
             GameObject result = null;
 
-            if (SingleObjectPool.Instance.GlobalPool.CachedPools.TryGetValue(original.gameObject, out PoolData pool))
+            if (cachedPools.TryGetValue(original.gameObject, out PoolData pool))
             {
                 result = pool.Spawn(parent, worldPositionStays);
             }
@@ -96,14 +98,9 @@ namespace Mace.Pooling
 
         public void Recycle(GameObject item, bool worldPositionStays = true)
         {
-            if (SingleObjectPool.IsDisposed)
-            {
-                return;
-            }
-
             PoolItem poolItem = item.GetComponent<PoolItem>();
 
-            if (poolItem && SingleObjectPool.Instance.GlobalPool.CachedPools.TryGetValue(poolItem.Original, out PoolData pool))
+            if (poolItem && cachedPools.TryGetValue(poolItem.Original, out PoolData pool))
             {
                 pool.Recycle(poolItem, worldPositionStays);
             }
@@ -144,8 +141,7 @@ namespace Mace.Pooling
 
         private void CreatePool(GameObject original, int initialSize, IEnumerable<GameObject> prewarmedItems)
         {
-            var globalPool = SingleObjectPool.Instance.GlobalPool;
-            if (globalPool.CachedPools.TryGetValue(original, out PoolData poolData))
+            if (cachedPools.TryGetValue(original, out PoolData poolData))
             {
                 if (prewarmedItems != null)
                 {
@@ -154,7 +150,7 @@ namespace Mace.Pooling
             }
             else
             {
-                globalPool.CachedPools.Add(original, new PoolData(globalPool, original, initialSize, 2f, prewarmedItems));
+                cachedPools.Add(original, new PoolData(this, original, initialSize, 2f, prewarmedItems));
             }
         }
 
@@ -173,11 +169,6 @@ namespace Mace.Pooling
             }
 
             return poolContainer;
-        }
-
-        public virtual void EnqueueReparent(Transform t)
-        {
-            SingleObjectPool.Instance.GlobalPool.EnqueueReparent(t);
         }
 
 #if UNITY_EDITOR
