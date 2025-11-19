@@ -28,7 +28,7 @@ namespace Mace.Pooling
         [SerializeField] private int maxPoolSize = 20;
         [SerializeField] private List<GameObject> poolPrefabs;
         [SerializeField] private List<PrefabInstancesEntry> prefabMap;
-        private Dictionary<GameObject, PoolData> cachedPools;
+        private readonly Dictionary<GameObject, PoolData> cachedPools = new ();
 
         private Transform poolContainer;
 
@@ -45,7 +45,6 @@ namespace Mace.Pooling
 
         private void InitializePools()
         {
-            cachedPools = new Dictionary<GameObject, PoolData>();
             if (poolPrefabs != null)
             {
                 foreach (GameObject objectToPool in poolPrefabs)
