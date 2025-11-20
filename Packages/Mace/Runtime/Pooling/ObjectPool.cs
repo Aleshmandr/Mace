@@ -28,7 +28,7 @@ namespace Mace.Pooling
         [SerializeField] private int maxPoolSize = 20;
         [SerializeField] private List<GameObject> poolPrefabs;
         [SerializeField] private List<PrefabInstancesEntry> prefabMap;
-        private readonly Dictionary<GameObject, PoolData> cachedPools = new ();
+        private readonly Dictionary<GameObject, PoolData> cachedPools = new();
 
         private Transform poolContainer;
 
@@ -65,6 +65,11 @@ namespace Mace.Pooling
 
         public void CreatePool<T>(T original, int initialSize) where T : Component
         {
+            if (original == null)
+            {
+                return;
+            }
+
             CreatePool(original.gameObject, initialSize);
         }
 
@@ -72,7 +77,7 @@ namespace Mace.Pooling
         {
             GameObject result = null;
 
-            if (cachedPools.TryGetValue(original.gameObject, out PoolData pool))
+            if (original != null && cachedPools.TryGetValue(original.gameObject, out PoolData pool))
             {
                 result = pool.Spawn(parent, worldPositionStays);
             }
@@ -82,24 +87,44 @@ namespace Mace.Pooling
 
         public GameObject Spawn(GameObject original)
         {
+            if (original == null)
+            {
+                return null;
+            }
+
             return Spawn(original, transform);
         }
 
         public T Spawn<T>(T original, Transform parent, bool worldPositionStays = true) where T : Component
         {
+            if (original == null)
+            {
+                return null;
+            }
+
             return Spawn(original.gameObject, parent, worldPositionStays).GetComponent<T>();
         }
 
         public T Spawn<T>(T original) where T : Component
         {
+            if (original == null)
+            {
+                return null;
+            }
+
             return Spawn(original.gameObject).GetComponent<T>();
         }
 
         public void Recycle(GameObject item, bool worldPositionStays = true)
         {
+            if (item == null)
+            {
+                return;
+            }
+
             PoolItem poolItem = item.GetComponent<PoolItem>();
 
-            if (poolItem && cachedPools.TryGetValue(poolItem.Original, out PoolData pool))
+            if (poolItem != null && cachedPools.TryGetValue(poolItem.Original, out PoolData pool))
             {
                 pool.Recycle(poolItem, worldPositionStays);
             }
@@ -111,6 +136,11 @@ namespace Mace.Pooling
 
         public void Recycle<T>(T item, bool worldPositionStays = true) where T : Component
         {
+            if (item == null)
+            {
+                return;
+            }
+
             Recycle(item.gameObject, worldPositionStays);
         }
 
@@ -140,6 +170,11 @@ namespace Mace.Pooling
 
         private void CreatePool(GameObject original, int initialSize, IEnumerable<GameObject> prewarmedItems)
         {
+            if (original == null)
+            {
+                return;
+            }
+
             if (cachedPools.TryGetValue(original, out PoolData poolData))
             {
                 if (prewarmedItems != null)

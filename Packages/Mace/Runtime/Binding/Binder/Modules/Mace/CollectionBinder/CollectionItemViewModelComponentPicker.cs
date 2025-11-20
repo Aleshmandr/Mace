@@ -10,6 +10,7 @@ namespace Mace
 	{
 		[SerializeField] private List<ViewModelComponent> prefabs;
 		[SerializeField] private ObjectPool pool;
+		[SerializeField] private bool reportMissingPrefabs = true;
 
 		private PrefabPicker<ViewModelComponent> prefabPicker;
 		private bool isInitialized;
@@ -25,7 +26,14 @@ namespace Mace
 
 			ViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
 
-			Assert.IsNotNull(bestPrefab, $"A suitable prefab could not be found for {value} ({value.GetType().GetPrettifiedName()}).");
+            if (bestPrefab == null)
+            {
+	            if (reportMissingPrefabs)
+	            {
+		            Debug.LogError($"A suitable prefab could not be found for {value} ({value.GetType().GetPrettifiedName()}).");
+	            }
+                return null;
+            }
 
 			return SpawnItem(bestPrefab, parent);
 		}
@@ -50,6 +58,11 @@ namespace Mace
 		public override void DisposeItem(int index, ViewModelComponent item)
 		{
 			EnsureInitialState();
+
+            if (item == null)
+            {
+                return;
+            }
 
 			if (pool)
 			{
@@ -86,8 +99,13 @@ namespace Mace
 		}
 
 		private ViewModelComponent SpawnItem(ViewModelComponent bestPrefab, Transform parent)
-		{
-			ViewModelComponent result;
+        {
+            if (bestPrefab == null)
+            {
+                return null;
+            }
+            
+            ViewModelComponent result;
 
 			if (pool)
 			{

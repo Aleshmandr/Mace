@@ -124,6 +124,10 @@ namespace Mace
 		{
 			ViewModelComponent newItem = itemPicker.SpawnItem(index, value, Container);
 			currentItems.Insert(index, newItem);
+            if (newItem == null)
+            {
+                return;
+            }
 			newItem.transform.SetSiblingIndex(index + startSiblingIndex);
 			newItem.ViewModel = value;
 		}
