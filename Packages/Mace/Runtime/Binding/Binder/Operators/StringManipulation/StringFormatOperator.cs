@@ -27,16 +27,18 @@ namespace Mace
 			parametersBindingList = new BindingList<object>(this, parameters);
 		}
 
-		protected virtual void OnEnable()
+        protected override void OnEnable()
 		{
+            base.OnEnable();
 			formatBinding.Property.Changed += OnFormatChanged;
 			parametersBindingList.VariableChanged += OnBindingListVariableChanged;
 			formatBinding.Bind();
 			parametersBindingList.Bind();
 		}
 
-		protected virtual void OnDisable()
+		protected override void OnDisable()
 		{
+            base.OnDisable();
 			formatBinding.Unbind();
 			parametersBindingList.Unbind();
 			formatBinding.Property.Changed -= OnFormatChanged;
@@ -56,7 +58,7 @@ namespace Mace
 
 		private void RefreshExposedValue()
 		{
-			if (formatBinding.IsBound && formatBinding.Property.HasValue && !string.IsNullOrEmpty(formatBinding.Property.Value))
+			if (formatBinding.IsBound && !string.IsNullOrEmpty(formatBinding.Property.Value))
 			{
 				exposedProperty.Value = string.Format(formatBinding.Property.Value, parametersBindingList.Values.ToArray());
 			}
