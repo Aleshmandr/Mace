@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,7 +7,6 @@ namespace Mace
     {
         [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<IViewModel>();
         [SerializeField] private bool keepBindingActiveWhileDisabled;
-        [SerializeField] private List<ViewModelComponent> prefabs;
         [SerializeField] private Transform itemContainer;
         [Header("Dependencies")]
         [SerializeField] protected ItemPicker itemPicker;
