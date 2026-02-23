@@ -1,36 +1,28 @@
 using System.Collections.Generic;
-using Mace.Pooling;
-using Mace.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Mace
 {
     public class SpawnPrefabBinder : ComponentBinder
     {
-        [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
+        [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<IViewModel>();
         [SerializeField] private bool keepBindingActiveWhileDisabled;
         [SerializeField] private List<ViewModelComponent> prefabs;
-        [SerializeField] private Transform parent;
-        [SerializeField] private ObjectPool pool;
-
-        private PrefabPicker<ViewModelComponent> prefabPicker;
+        [SerializeField] private Transform itemContainer;
+        [Header("Dependencies")]
+        [SerializeField] protected ItemPicker itemPicker;
         private ViewModelComponent currentItem;
-        private bool isInitialized;
 
-        private Transform Parent => parent ? parent : transform;
+        private Transform Container => itemContainer ? itemContainer : transform;
 
         protected override void Awake()
         {
             base.Awake();
 
-            RegisterVariable<object>(objectToInstantiate)
-                .OnChanged(OnObjectChanged)
-                .OnCleared(OnObjectCleared);
-
-            prefabPicker = new PrefabPicker<ViewModelComponent>(prefabs);
-            currentItem = null;
-
-            FillPool();
+            Assert.IsNotNull(itemPicker, $"A {nameof(SpawnPrefabBinder)} needs an {nameof(ItemPicker)} to work.");
+            
+            RegisterVariable<IViewModel>(objectToInstantiate).OnChanged(OnObjectChanged).OnCleared(OnObjectCleared);
 
             if (keepBindingActiveWhileDisabled)
             {
@@ -67,43 +59,17 @@ namespace Mace
             }
         }
 
-        private void FillPool()
+        private void OnObjectChanged(IViewModel value)
         {
-            if (pool == null)
-            {
-                return;
-            }
+            Clear();
+            currentItem = itemPicker.SpawnItem(value, Container);
 
-            foreach (ViewModelComponent prefab in prefabs)
+            if (currentItem == null)
             {
-                pool.CreatePool(prefab, 1);
-            }
-        }
-
-        private void OnObjectChanged(object value)
-        {
-            if (value == null)
-            {
-                Clear();
                 return;
             }
             
-            ViewModelComponent bestPrefab = prefabPicker.FindBestPrefab(value);
-
-            if (bestPrefab)
-            {
-                if (currentItem == null || bestPrefab.ExpectedType != currentItem.ExpectedType)
-                {
-                    currentItem = SpawnItem(bestPrefab, Parent);
-                }
-
-                currentItem.ViewModel = (IViewModel)value;
-            }
-            else
-            {
-                Clear();
-                Debug.LogError($"A matching prefab could not be found for {value} ({value.GetType().GetPrettifiedName()})");
-            }
+            currentItem.ViewModel = value;
         }
 
         private void OnObjectCleared()
@@ -111,41 +77,20 @@ namespace Mace
             Clear();
         }
 
-        private ViewModelComponent SpawnItem(ViewModelComponent prefab, Transform parent)
-        {
-            Clear();
-            return pool != null ? pool.Spawn(prefab, parent, false) : Instantiate(prefab, parent, false);
-        }
-
         private void Clear()
         {
-            if (currentItem == null)
+            itemPicker.DisposeItem(currentItem);
+            currentItem = null;
+        }
+        
+        protected virtual void OnValidate()
+        {
+            if (itemContainer != null)
             {
                 return;
             }
 
-            if (pool == null)
-            {
-                Destroy(currentItem.gameObject);
-            }
-            else
-            {
-                pool.Recycle(currentItem);
-            }
-
-            currentItem = null;
+            itemContainer = transform;
         }
-
-
-#if UNITY_EDITOR
-        protected void Reset()
-        {
-            pool = GetComponent<ObjectPool>();
-            if (parent == null)
-            {
-                parent = transform;
-            }
-        }
-#endif
     }
 }
