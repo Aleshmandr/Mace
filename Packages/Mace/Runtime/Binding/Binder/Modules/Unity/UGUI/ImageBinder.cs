@@ -12,6 +12,7 @@ namespace Mace
     {
         [SerializeField] private BindingInfo sourceImage = BindingInfo.Variable<Sprite>();
         [SerializeField] private BindingInfo fillAmount = BindingInfo.Variable<float>();
+        [SerializeField] private bool useImageNativeSize;
 
         private Image imageComponent;
 
@@ -31,6 +32,10 @@ namespace Mace
         private void HandleSourceImageChange(Sprite newValue)
         {
             imageComponent.overrideSprite = newValue;
+            if (useImageNativeSize)
+            {
+                imageComponent.SetNativeSize();
+            }
         }
         
 #if UNITY_EDITOR
