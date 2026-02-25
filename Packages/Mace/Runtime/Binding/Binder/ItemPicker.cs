@@ -19,7 +19,7 @@ namespace Mace
             EnsureInitialState();
         }
 
-        public ViewModelComponent SpawnItem(IViewModel value, Transform parent)
+        public ViewModelComponent SpawnItem(object value, Transform parent)
         {
             EnsureInitialState();
 
@@ -32,7 +32,8 @@ namespace Mace
 
             if (reportMissingPrefabs)
             {
-                Debug.LogError($"A suitable prefab could not be found for {value} ({value.GetType().GetPrettifiedName()}).");
+                string prettifiedName = value == null ? string.Empty : value.GetType().GetPrettifiedName();
+                Debug.LogError($"A suitable prefab could not be found for {value} ({prettifiedName}).");
             }
 
             return null;
@@ -47,7 +48,7 @@ namespace Mace
             var prefabForOldValue = prefabPicker.FindBestPrefab(oldValue);
             var prefabForNewValue = prefabPicker.FindBestPrefab(newValue);
 
-            if (ReferenceEquals(prefabForOldValue, prefabForNewValue) == false)
+            if (!ReferenceEquals(prefabForOldValue, prefabForNewValue))
             {
                 result = SpawnItem(prefabForNewValue, parent);
             }

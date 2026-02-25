@@ -5,7 +5,7 @@ namespace Mace
 {
     public class SpawnPrefabBinder : ComponentBinder
     {
-        [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<IViewModel>();
+        [SerializeField] private BindingInfo objectToInstantiate = BindingInfo.Variable<object>();
         [SerializeField] private bool keepBindingActiveWhileDisabled;
         [SerializeField] private Transform itemContainer;
         [Header("Dependencies")]
@@ -20,7 +20,7 @@ namespace Mace
 
             Assert.IsNotNull(itemPicker, $"A {nameof(SpawnPrefabBinder)} needs an {nameof(ItemPicker)} to work.");
             
-            RegisterVariable<IViewModel>(objectToInstantiate).OnChanged(OnObjectChanged).OnCleared(OnObjectCleared);
+            RegisterVariable<object>(objectToInstantiate).OnChanged(OnObjectChanged).OnCleared(OnObjectCleared);
 
             if (keepBindingActiveWhileDisabled)
             {
@@ -57,7 +57,7 @@ namespace Mace
             }
         }
 
-        private void OnObjectChanged(IViewModel value)
+        private void OnObjectChanged(object value)
         {
             Clear();
             currentItem = itemPicker.SpawnItem(value, Container);
@@ -67,7 +67,7 @@ namespace Mace
                 return;
             }
             
-            currentItem.ViewModel = value;
+            currentItem.ViewModel = value as ViewModel;
         }
 
         private void OnObjectCleared()
