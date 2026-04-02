@@ -9,7 +9,8 @@ namespace Mace
         [SerializeField] private UnityEvent onEventRaise;
         [SerializeField] private BindingInfo variable = BindingInfo.Variable<object>();
         [SerializeField] private UnityEvent onVariableChange;
-        
+        private int activationFrame;
+
         protected override void Awake()
         {
             base.Awake();
@@ -17,8 +18,19 @@ namespace Mace
             RegisterVariable<object>(variable).OnChanged(HandleVariableChange);
         }
 
+        protected override void OnEnable()
+        {
+            activationFrame = Time.frameCount;
+            base.OnEnable();
+        }
+
         private void HandleVariableChange(object value)
         {
+            if (activationFrame >= Time.frameCount)
+            {
+                return;
+            }
+
             onVariableChange?.Invoke();
         }
 

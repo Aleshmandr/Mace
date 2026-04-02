@@ -7,18 +7,30 @@ namespace Mace
     {
         [SerializeField] private BindingInfo variable = BindingInfo.Variable<object>();
         private ObservableEvent exposedEvent;
+        private int activationFrame;
 
         protected override void Awake()
         {
             base.Awake();
-            RegisterVariable<object>(variable).OnChanged(HandleVariableChange);
             exposedEvent = new ObservableEvent();
+            RegisterVariable<object>(variable).OnChanged(HandleVariableChange);
             ViewModel = new EventViewModel(exposedEvent);
         }
-        
+
+        protected override void OnEnable()
+        {
+            activationFrame = Time.frameCount;
+            base.OnEnable();
+        }
+
         private void HandleVariableChange(object newValue)
         {
-            exposedEvent.Raise();
+            if (activationFrame >= Time.frameCount)
+            {
+                return;
+            }
+            
+            exposedEvent?.Raise();
         }
 
         protected override Type GetInjectionType()
