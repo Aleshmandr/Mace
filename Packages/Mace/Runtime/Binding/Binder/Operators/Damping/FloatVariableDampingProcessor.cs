@@ -8,6 +8,7 @@ namespace Mace
         private readonly bool useUnscaledTime;
         private bool isDampedValueInitialized;
         private float dampedValue;
+        private float targetValue;
         private float currentVelocity;
         
         public FloatVariableDampingProcessor(BindingInfo bindingInfo, Component viewModel, float damping, bool useUnscaledTime) : base(bindingInfo, viewModel)
@@ -22,18 +23,28 @@ namespace Mace
             isDampedValueInitialized = false;
         }
 
+        protected override void OnBoundVariableChanged(float newValue)
+        {
+            targetValue = newValue;
+        }
+
         public void Update()
         {
+            if (Mathf.Approximately(targetValue, processedVariable.Value) && isDampedValueInitialized)
+            {
+                return;
+            }
+            
             if (!isDampedValueInitialized)
             {
-                dampedValue = variableBinding.Property.Value;
+                dampedValue = targetValue = variableBinding.Property.Value;
                 currentVelocity = 0f;
                 isDampedValueInitialized = true;
             }
             
             float dt = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
-            dampedValue = Mathf.SmoothDamp(dampedValue, variableBinding.Property.Value, ref currentVelocity, damping, float.MaxValue, dt);
-            OnBoundVariableChanged(dampedValue);
+            dampedValue = Mathf.SmoothDamp(dampedValue, targetValue, ref currentVelocity, damping, float.MaxValue, dt);
+            base.OnBoundVariableChanged(dampedValue);
         }
 
         protected override float ProcessValue(float value)

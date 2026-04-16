@@ -5,6 +5,7 @@ namespace Mace
     public abstract class DelayOperator<T> : ProcessorOperator<T, T>
     {
         [SerializeField] private float delay;
+        [SerializeField] private bool syncOnBind;
         private IUpdatableBindingProcessor updatableBindingProcessor;
 
         protected override IBindingProcessor GetBindingProcessor(BindingType bindingType, BindingInfo fromBinding)
@@ -12,7 +13,7 @@ namespace Mace
             switch (bindingType)
             {
                 case BindingType.Variable:
-                    updatableBindingProcessor = new DelayVariableBindingProcessor<T>(fromBinding, this, delay);
+                    updatableBindingProcessor = new DelayVariableBindingProcessor<T>(fromBinding, this, delay, syncOnBind);
                     break;
                 case BindingType.Collection:
                     updatableBindingProcessor = new DelayCollectionBindingProcessor<T>(fromBinding, this, delay);
