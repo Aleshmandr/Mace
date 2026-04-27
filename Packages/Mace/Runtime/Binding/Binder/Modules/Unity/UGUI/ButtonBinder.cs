@@ -50,6 +50,11 @@ namespace Mace
 
 		private void OnInteractableChanged(bool newValue)
 		{
+			if (button == null)
+			{
+				return;
+			}
+			
 			button.interactable = newValue;
 		}
 	}
