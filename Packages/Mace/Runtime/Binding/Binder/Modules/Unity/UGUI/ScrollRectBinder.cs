@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Mace.Utils;
 #if UNITY_EDITOR
@@ -18,7 +19,7 @@ namespace Mace
         [SerializeField] private Vector2 focusMargin;
         [SerializeField] private Vector2 focusPointOffset;
         [SerializeField] private NothingSelectedBehaviorMode nothingSelectedBehaviorMode;
-        [SerializeField] private FocusScrollActivationMode focusScrollActivationMode;
+        [SerializeField] private FocusScrollAnimationPlaybackMode focusScrollAnimationPlaybackMode;
         [SerializeField, Min(0f)] private float focusScrollSpeed;
         private ScrollRect scrollRect;
         private Vector2 focusAnimationTargetPosition;
@@ -33,10 +34,10 @@ namespace Mace
             KeepCurrent = 1,
         }
 
-        private enum FocusScrollActivationMode : byte
+        private enum FocusScrollAnimationPlaybackMode : byte
         {
-            FocusOnEnableAndTargetChange = 0,
-            FocusOnTargetChangeOnly = 1,
+            AnimateOnEnableAndTargetChange = 0,
+            AnimateOnTargetChangeOnly = 1,
         }
 
         protected override void Awake()
@@ -103,11 +104,6 @@ namespace Mace
 
         private void OnItemChanged(object itemViewModel)
         {
-            if (ShouldSkipInitialFocus())
-            {
-                return;
-            }
-
             if (!TryFocusOnItem(itemViewModel))
             {
                 ResetScrollIfNeeded();
@@ -146,7 +142,7 @@ namespace Mace
 
             scrollRect.StopMovement();
             Vector2 targetPosition = scrollRect.GetFocusOnChildContentPosition(child, focusMargin, focusPointOffset);
-            if (focusScrollSpeed <= 0f)
+            if (!ShouldAnimateFocus())
             {
                 CancelFocusAnimation();
                 SetContentPosition(targetPosition);
@@ -189,10 +185,15 @@ namespace Mace
             }
         }
 
-        private bool ShouldSkipInitialFocus()
+        private bool ShouldAnimateFocus()
         {
-            return isBindingInitialNotification &&
-                   focusScrollActivationMode == FocusScrollActivationMode.FocusOnTargetChangeOnly;
+            if (focusScrollSpeed <= 0f)
+            {
+                return false;
+            }
+
+            return !isBindingInitialNotification ||
+                   focusScrollAnimationPlaybackMode == FocusScrollAnimationPlaybackMode.AnimateOnEnableAndTargetChange;
         }
 
         private void CancelFocusAnimation()
