@@ -29,6 +29,37 @@ There are four members in the observable family, each of them intended for a par
 ### ObservableVariable
 This is the battle horse of the whole system; one of the simpler and most useful of all the members of the family. It just wraps a variable and notifies when its value changes. It's worth noting that it won't raise a change event when its `.Value` is set with the same value that is already stored.
 
+### ReadOnlyReactiveProperty
+`ReadOnlyReactiveProperty<T>` is a read-only observable value derived from one or more existing observable variables. It implements `IReadOnlyObservableVariable<T>`, so it can be exposed from ViewModels and consumed by regular Mace bindings.
+
+Use `Select` to transform one observable value:
+
+```csharp
+public IReadOnlyObservableVariable<string> LevelText { get; }
+
+LevelText = Level.Select(level => $"Level {level}");
+```
+
+Use `CombineLatest` to derive a value from multiple observable values, including values of different types:
+
+```csharp
+public IReadOnlyObservableVariable<bool> ShowAlert { get; }
+
+ShowAlert = HasAlert.CombineLatest(IsNew, (hasAlert, isNew) => hasAlert && !isNew);
+```
+
+```csharp
+public IReadOnlyObservableVariable<bool> IsAvailable { get; }
+
+IsAvailable = IsUnlocked.CombineLatest(CooldownTimer, (isUnlocked, timer) => isUnlocked && timer <= 0f);
+```
+
+There are also boolean helpers for common cases:
+
+```csharp
+ShowAlert = HasAlert.And(IsNew.Not());
+```
+
 ### ObservableCollection
 It represents a collection or a list of elements of the same type. You'll find all operations that you'd expect for a regular `List<T>`, and it'll notify a particular event for each of them.
 
