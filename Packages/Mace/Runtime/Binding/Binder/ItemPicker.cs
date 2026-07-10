@@ -71,6 +71,8 @@ namespace Mace
             }
             else
             {
+                // Destroy is deferred, so deactivate the item immediately.
+                item.gameObject.SetActive(false);
                 Destroy(item.gameObject);
             }
         }
